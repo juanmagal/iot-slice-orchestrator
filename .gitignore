@@ -1,0 +1,7 @@
+.cache
+.coverage
+.pyc
+*.egg-info
+build
+dist
+*cache*

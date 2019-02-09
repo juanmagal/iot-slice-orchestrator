@@ -3,6 +3,7 @@ iotorch
 
 Usage:
   iotorch hello
+  iotorch k8scluster create
   iotorch -h | --help
   iotorch --version
 
@@ -29,7 +30,7 @@ def main():
 
     # Here we'll try to dynamically match the command the user is trying to run
     # with a pre-defined command class we've already created.
-    for (k, v) in options.items(): 
+    for (k, v) in options.items():
         if hasattr(iotorch.commands, k) and v:
             module = getattr(iotorch.commands, k)
             iotorch.commands = getmembers(module, isclass)

@@ -4,6 +4,10 @@ iotorch
 Usage:
   iotorch hello
   iotorch k8scluster create
+  iotorch iotslice create
+  iotorch iotdevice create
+  iotorch iotgateway create
+  iotorch iotserver create
   iotorch -h | --help
   iotorch --version
 

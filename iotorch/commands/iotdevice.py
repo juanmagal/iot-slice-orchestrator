@@ -1,5 +1,7 @@
 """
-  Usage: iotorch iotdevice [create | delete] 
+iotorch iotdevice
+
+  Usage:  iotorch iotdevice [create|delete] --name=<name>   
 
 """
 
@@ -13,11 +15,11 @@ class Iotdevice(Base):
     """The IoT Device command."""
 
     def create(self):
-        print('Creating IoT Device!')
+        print('Creating IoT Device:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))        
 
     def delete(self):
-        print('Deleting IoT Device!')
+        print('Deleting IoT Device:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def run(self):

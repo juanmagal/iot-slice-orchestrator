@@ -1,8 +1,9 @@
 """
-  Usage: iotorch iotslice [create | delete] 
+iotorch iotslice
+
+  Usage:  iotorch iotslice [create|delete] --name=<name> [--edge=<edgecluster>] [--cloud=<cloudcluster>]    
 
 """
-
 from json import dumps
 
 from .base import Base
@@ -13,11 +14,11 @@ class Iotslice(Base):
     """The IoT Slice command."""
 
     def create(self):
-        print('Creating IoT Slice!')
+        print('Creating IoT Slice:',self.options['--name'],self.options['--edge'],self.options['--cloud'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def delete(self):
-        print('Deleting IoT Slice!')
+        print('Deleting IoT Slice:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def run(self):

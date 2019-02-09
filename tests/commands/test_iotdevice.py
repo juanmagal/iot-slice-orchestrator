@@ -8,11 +8,17 @@ from unittest import TestCase
 class TestIoTDevice(TestCase):
 
     def test_returns_iotdevice_create(self):
-        output = popen(['iotorch', 'iotdevice', 'create'], stdout=PIPE).communicate()[0]
-        self.assertTrue('Creating IoT Device!'.encode('utf-8') in output)
+        name='device1'
+        operation='create'
+        text= 'Creating IoT Device: ' + name
+        output = popen(['iotorch', 'iotdevice', operation, '--name='+name], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
 
 
     def test_returns_iotdevice_delete(self):
-        output = popen(['iotorch', 'iotdevice', 'delete'], stdout=PIPE).communicate()[0]
-        self.assertTrue('Deleting IoT Device!'.encode('utf-8') in output)
+        name='device1'
+        operation='delete'
+        text='Deleting IoT Device: ' + name
+        output = popen(['iotorch', 'iotdevice', operation, '--name='+name], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
 

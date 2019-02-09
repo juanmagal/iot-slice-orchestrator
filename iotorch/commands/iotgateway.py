@@ -1,5 +1,7 @@
 """
-  Usage: iotorch iotgateway [create | delete] 
+iotorch iotgateway
+
+  Usage:  iotorch iotgateway  [create|delete|attach] --name=<name> [--cluster=<cluster>] [--slice=<slice>] [--server=<server>]   
 
 """
 
@@ -13,11 +15,15 @@ class Iotgateway(Base):
     """The IoT Gateway command."""
 
     def create(self):
-        print('Creating IoT Gateway!')
+        print('Creating IoT Gateway:',self.options['--name'],self.options['--cluster'],self.options['--slice'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def delete(self):
-        print('Deleting IoT Gateway!')
+        print('Deleting IoT Gateway:',self.options['--name'])
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+    def attach(self):
+        print('Attaching IoT Gateway:',self.options['--name'],'to IoT Server',self.options['--server'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def run(self):
@@ -30,6 +36,9 @@ class Iotgateway(Base):
         elif options['delete']:
             self.options=options
             self.delete()
+        elif options['attach']:
+            self.options=options
+            self.attach()
         else:
             print("Option not implemented")
             raise NotImplementedError('Option not implemented')

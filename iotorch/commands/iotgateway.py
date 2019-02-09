@@ -1,20 +1,36 @@
-"""The IoT Gateway command."""
+"""
+  Usage: iotorch iotgateway [create | delete] 
+
+"""
 
 from json import dumps
 
 from .base import Base
 
+from docopt import docopt
 
 class Iotgateway(Base):
     """The IoT Gateway command."""
 
     def create(self):
         print('Creating IoT Gateway!')
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))        
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+    def delete(self):
+        print('Deleting IoT Gateway!')
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def run(self):
-        if self.options['create']:
+
+        options = docopt(__doc__)
+
+        if options['create']:
+            self.options=options
             self.create()
+        elif options['delete']:
+            self.options=options
+            self.delete()
         else:
-            print("Option not implemented")    
+            print("Option not implemented")
             raise NotImplementedError('Option not implemented')
+

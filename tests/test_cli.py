@@ -10,10 +10,10 @@ from iotorch import __version__ as VERSION
 class TestHelp(TestCase):
     def test_returns_usage_information(self):
         output = popen(['iotorch', '-h'], stdout=PIPE).communicate()[0]
-        self.assertTrue('Usage:'.encode('utf-8') in output)
+        self.assertTrue('usage:'.encode('utf-8') in output)
 
         output = popen(['iotorch', '--help'], stdout=PIPE).communicate()[0]
-        self.assertTrue('Usage:'.encode('utf8') in output)
+        self.assertTrue('usage:'.encode('utf8') in output)
 
 
 class TestVersion(TestCase):

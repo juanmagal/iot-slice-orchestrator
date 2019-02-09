@@ -1,5 +1,9 @@
-"""The hello command."""
+"""
+  usage: iotorch hello
 
+"""
+
+from docopt import docopt
 
 from json import dumps
 
@@ -10,5 +14,8 @@ class Hello(Base):
     """Say hello, world!"""
 
     def run(self):
+
+        options = docopt(__doc__)
+        
         print('Hello, world!')
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+        print('You supplied the following options:', dumps(options, indent=2, sort_keys=True))

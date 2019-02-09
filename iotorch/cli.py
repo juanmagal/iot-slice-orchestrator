@@ -1,15 +1,7 @@
 """
 iotorch
 
-Usage:
-  iotorch hello
-  iotorch k8scluster create
-  iotorch iotslice create
-  iotorch iotdevice create
-  iotorch iotgateway create
-  iotorch iotserver create
-  iotorch -h | --help
-  iotorch --version
+usage: iotorch [--version] [-h | --help] <command> [<args>...]
 
 Options:
   -h --help                         Show this screen.
@@ -19,6 +11,14 @@ Examples:
   iotorch help
 """
 
+#  iotorch hello
+#  iotorch k8scluster create
+#  iotorch iotslice create
+#  iotorch iotdevice create
+#  iotorch iotgateway create
+#  iotorch iotserver create
+#  iotorch -h | --help
+#  iotorch --version
 
 from inspect import getmembers, isclass
 
@@ -29,15 +29,25 @@ from . import __version__ as VERSION
 
 def main():
     """Main CLI entrypoint."""
+        
     import iotorch.commands
+
     options = docopt(__doc__, version=VERSION)
 
     # Here we'll try to dynamically match the command the user is trying to run
     # with a pre-defined command class we've already created.
-    for (k, v) in options.items():
-        if hasattr(iotorch.commands, k) and v:
-            module = getattr(iotorch.commands, k)
-            iotorch.commands = getmembers(module, isclass)
-            command = [command[1] for command in iotorch.commands if command[0] != 'Base'][0]
-            command = command(options)
-            command.run()
+
+    command = options['<command>']
+
+    commandargs = options['<args>']
+
+    module = getattr(iotorch.commands, command)
+
+    iotorch.commands = getmembers(module, isclass)
+
+    commandclass = [commandclass[1] for commandclass in iotorch.commands if commandclass[0] != 'Base'][0] 
+    
+    commandclass = commandclass(options)
+
+    commandclass.run()
+

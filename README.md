@@ -23,10 +23,41 @@ Usage
 
 The following commands can be executed:
 
-* For configuration Kubernetes clusters where IoT Gateways and Servers will be deployed:
+For configuration of Kubernetes clusters where IoT Gateways and Servers will be deployed:
 
-    $ pip install -e .[test]
+    $ iotorch k8scluster create --name=<name> --ip=<ipaddress>
+    $ iotorch k8scluster delete --name=<name>
+    $ iotorch k8scluster get --name=<name>
+    $ iotorch k8scluster list
 
+For definition of IoT Slices:
+
+    $ iotorch iotslice create --name=<name> --edge=<k8cluster> --cloud=<k8cluster>
+    $ iotorch iotslice delete --name=<name>
+    $ iotorch iotslice get --name=<name>
+    $ iotorch iotslice list
+
+In order to manager IoT Servers:
+
+    $ iotorch iotserver create --name=<name> --cluster=<k8scluster> [--slice=<iotslice>]
+    $ iotorch iotserver delete --name=<name>
+    $ iotorch iotserver get --name=<name>
+    $ iotorch iotserver list
+
+In order to manage IoT Gateways :
+
+    $ iotorch iotgateway create --name=<name> --cluster=<k8cluster> [--slice=<iotslice>]
+    $ iotorch iotgateway attach --name=<name> --server=<iotserver>
+    $ iotorch iotgateway delete --name=<name>
+    $ iotorch iotgateway get --name=<name>
+    $ iotorch iotgateway list
+
+To handle IoT Devices and attach them to an IoT Gateway:
+
+    $ iotorch iotdevice create --name=<name> [--gateway=<iotgateway>]
+    $ iotorch iotdevice delete --name=<name>
+    $ iotorch iotdevice get --name=<name>
+    $ iotorch iotdevice list
 
 Testing
 -------

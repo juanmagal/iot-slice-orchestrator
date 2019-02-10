@@ -59,6 +59,49 @@ To handle IoT Devices and attach them to an IoT Gateway:
     $ iotorch iotdevice get --name=<name>
     $ iotorch iotdevice list
 
+Initial Configuration
+---------------------
+
+It is possible to define the initial configuration of the system by creating a toml file, whose name by default is ``iotorch.toml`` and shall be located in the same folder from which iotorch commands will be called.
+This is a fairly complete initial configuration example:
+
+.. code:: ini
+
+    title = "Example of IoT Orchestrator Configuration"
+    
+    # List of IoT devices
+    [iotdevices]
+        [iotdevice.test]
+        name = "test"
+        gateway = "test"
+    
+    # List of configured kubernetes clusters
+    [k8sclusters]
+        [k8scluster.test]
+        name = "test"
+        ip = "127.0.0.1"
+   
+    # List of IoT slices
+    [iotslices]
+        [iotslice.test]
+        name = "test"
+        edge = "test"
+        cloud = "test"
+    
+    # List of IoT Gateways
+    [iotgateways]
+        [iotgateway.test]
+        name = "test"
+        slice = "test"
+        cluster = "test"
+    
+    # List of IoT Servers
+    [iotservers]
+        [iotserver.test]
+        name = "test"
+        slice = "test"
+        cluster = "test"
+        
 Testing
 -------
 Execute the following command to execute all tests

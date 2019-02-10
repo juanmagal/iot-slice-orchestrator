@@ -1,7 +1,7 @@
 """
 iotorch iotslice
 
-  Usage:  iotorch iotslice [create|delete] --name=<name> [--edge=<edgecluster>] [--cloud=<cloudcluster>]    
+  Usage:  iotorch iotslice [create|delete|get|list] [--name=<name>] [--edge=<edgecluster>] [--cloud=<cloudcluster>] [--configfile=<name>] 
 
 """
 from json import dumps
@@ -9,6 +9,10 @@ from json import dumps
 from .base import Base
 
 from docopt import docopt
+
+import toml
+
+import os
 
 class Iotslice(Base):
     """The IoT Slice command."""
@@ -21,6 +25,36 @@ class Iotslice(Base):
         print('Deleting IoT Slice:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
+    def get(self):
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        if not os.path.exists(config_path):
+           print('Nothing to get')
+        else:
+           with open(config_path) as f:
+               config = toml.load(f)
+               slices = config['iotslice']
+               print(slices[self.options['--name']])
+
+    def list(self):
+
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        if not os.path.exists(config_path):
+           print('Nothing to list')
+        else:
+           with open(config_path) as f:
+               config = toml.load(f)
+               slices = config['iotslice']
+               print (list(slices.keys()))
+
+
     def run(self):
 
         options = docopt(__doc__)
@@ -31,6 +65,12 @@ class Iotslice(Base):
         elif options['delete']:
             self.options=options
             self.delete()
+        elif options['get']:
+            self.options=options
+            self.get()
+        elif options['list']:
+            self.options=options
+            self.list()
         else:
             print("Option not implemented")
             raise NotImplementedError('Option not implemented')

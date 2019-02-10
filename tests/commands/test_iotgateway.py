@@ -30,3 +30,32 @@ class TestIotGateway(TestCase):
         text='Deleting IoT Gateway: ' + name
         output = popen(['iotorch', 'iotgateway', operation, '--name='+name], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
+
+    def test_returns_iotgateway_get(self):
+        name='test'
+        operation='get'
+        configfile='./tests/conf/iotorch.toml'
+        output = popen(['iotorch', 'iotgateway', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(name.encode('utf-8') in output)
+
+    def test_returns_iotgateway_get_file_does_not_exit(self):
+        name='test'
+        operation='get'
+        text='Nothing to get'
+        output = popen(['iotorch', 'iotgateway', operation, '--name='+name], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
+
+    def test_returns_iotgateway_list(self):
+        name='test'
+        operation='list'
+        configfile='./tests/conf/iotorch.toml'
+        output = popen(['iotorch', 'iotgateway', operation, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(name.encode('utf-8') in output)
+
+    def test_returns_iotgateway_list_file_does_not_exist(self):
+        name='test'
+        operation='list'
+        text='Nothing to list'
+        output = popen(['iotorch', 'iotgateway', operation], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
+

@@ -30,4 +30,31 @@ class TestK8sCluster(TestCase):
         output,error = popen(['iotorch', 'k8scluster', operation, '--name='+name], stdout=PIPE).communicate()
         self.assertTrue(text.encode('utf-8') in output)
 
+    def test_returns_k8scluster_get(self):
+        name='test'
+        operation='get'
+        configfile='./tests/conf/iotorch.toml'
+        output = popen(['iotorch', 'k8scluster', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(name.encode('utf-8') in output)
+
+    def test_returns_k8scluster_get_file_does_not_exit(self):
+        name='test'
+        operation='get'
+        text='Nothing to get'
+        output = popen(['iotorch', 'k8scluster', operation, '--name='+name], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
+
+    def test_returns_k8scluster_list(self):
+        name='test'
+        operation='list'
+        configfile='./tests/conf/iotorch.toml'
+        output = popen(['iotorch', 'k8scluster', operation, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(name.encode('utf-8') in output)
+
+    def test_returns_k8scluster_list_file_does_not_exist(self):
+        name='test'
+        operation='list'
+        text='Nothing to list'
+        output = popen(['iotorch', 'k8scluster', operation], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
 

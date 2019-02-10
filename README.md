@@ -62,7 +62,8 @@ To handle IoT Devices and attach them to an IoT Gateway:
 Initial Configuration
 ---------------------
 
-It is possible to define the initial configuration of the system by creating a toml file, whose name by default is ``iotorch.toml`` and shall be located in the same folder from which iotorch commands will be called.
+It is possible to define the initial configuration of the system by creating a toml file, whose name by default is ``iotorch.toml`` and shall be located in the same folder from which iotorch commands will be called. This file is updated whenever any of the commands above modify this configuration (e.g. creating or deleting entries)
+
 This is a fairly complete initial configuration example:
 
     title = "Example of IoT Orchestrator Configuration"

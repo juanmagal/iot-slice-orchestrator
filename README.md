@@ -65,8 +65,6 @@ Initial Configuration
 It is possible to define the initial configuration of the system by creating a toml file, whose name by default is ``iotorch.toml`` and shall be located in the same folder from which iotorch commands will be called.
 This is a fairly complete initial configuration example:
 
-.. code:: ini
-
     title = "Example of IoT Orchestrator Configuration"
     
     # List of IoT devices

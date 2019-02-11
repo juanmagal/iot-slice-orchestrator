@@ -41,8 +41,12 @@ class Iotgateway(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               devices = config['iotgateway']
-               print(devices[self.options['--name']])
+               gateways = config.get('iotgateways')
+               gateway = gateways.get(self.options['--name'])
+               if gateway == None:
+                   print('Nothing to get')
+               else:
+                   print(gateway)
 
     def list(self):
 
@@ -56,9 +60,11 @@ class Iotgateway(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               devices = config['iotgateway']
-               print (list(devices.keys()))
-
+               gateways = config.get('iotgateways')
+               if gateways == None:
+                  print('Nothing to list')
+               else:
+                  print (list(gateways.keys()))
 
 
     def run(self):

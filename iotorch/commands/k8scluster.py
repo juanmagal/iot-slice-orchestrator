@@ -46,8 +46,12 @@ class K8scluster(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               clusters = config['k8scluster']
-               print(clusters[self.options['--name']])
+               clusters = config.get('k8sclusters')
+               cluster = clusters.get(self.options['--name'])
+               if cluster == None:
+                   print('Nothing to get')
+               else:
+                   print(cluster)
 
     def list(self):
 
@@ -61,10 +65,11 @@ class K8scluster(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               clusters = config['k8scluster']
-               print (list(clusters.keys()))
-
-
+               clusters = config.get('k8scluxters')
+               if clusters == None:
+                  print('Nothing to list')
+               else:
+                  print (list(clusters.keys()))
 
     def run(self):
 

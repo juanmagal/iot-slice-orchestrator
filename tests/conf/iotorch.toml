@@ -5,42 +5,46 @@ name = "Juan Manuel Fernandez"
 
 [iotdevices]
 
-[iotdevice.test]
-name = "test"
+[iotdevices.test]
 gateway = "test"
 
-[iotdevice.test2]
-name = "test2"
+[iotdevices.test2]
 gateway = "test"
 
 [k8sclusters]
 
-[k8scluster.test]
-name = "test"
+[k8sclusters.test]
+ip = "127.0.0.1"
+
+[k8sclusters.test1]
 ip = "127.0.0.1"
 
 [iotslices]
 
-[iotslice.test]
-name = "test"
+[iotslices.test]
 edge = "test"
 cloud = "test"
 
-[iotslice.test2]
-name = "test2"
+[iotslices.test1]
 edge = "test"
 cloud = "test"
 
 [iotgateways]
 
-[iotgateway.test]
-name = "test"
+[iotgateways.test]
+slice = "test"
+cluster = "test"
+
+[iotgateways.test1]
 slice = "test"
 cluster = "test"
 
 [iotservers]
 
-[iotserver.test]
-name = "test"
+[iotservers.test]
+slice = "test"
+cluster = "test"
+
+[iotservers.test1]
 slice = "test"
 cluster = "test"

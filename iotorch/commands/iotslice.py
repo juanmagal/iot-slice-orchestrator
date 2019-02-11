@@ -36,8 +36,12 @@ class Iotslice(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               slices = config['iotslice']
-               print(slices[self.options['--name']])
+               slices = config.get('iotslices')
+               iotslice = slices.get(self.options['--name'])
+               if iotslice == None:
+                   print('Nothing to get')
+               else:
+                   print(iotslice)
 
     def list(self):
 
@@ -51,8 +55,11 @@ class Iotslice(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               slices = config['iotslice']
-               print (list(slices.keys()))
+               slices = config.get('iotslices')
+               if slices == None:
+                  print('Nothing to list')
+               else:
+                  print (list(slices.keys()))
 
 
     def run(self):

@@ -36,8 +36,12 @@ class Iotserver(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               servers = config['iotserver']
-               print(servers[self.options['--name']])
+               servers = config.get('iotservers')
+               server = servers.get(self.options['--name'])
+               if server == None:
+                   print('Nothing to get')
+               else:
+                   print(server)
 
     def list(self):
 
@@ -51,8 +55,11 @@ class Iotserver(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               servers = config['iotserver']
-               print (list(servers.keys()))
+               servers = config.get('iotservers')
+               if servers == None:
+                  print('Nothing to list')
+               else:
+                  print (list(servers.keys()))
 
 
     def run(self):

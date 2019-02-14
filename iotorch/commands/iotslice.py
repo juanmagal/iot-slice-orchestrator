@@ -10,6 +10,8 @@ from .base import Base
 
 from docopt import docopt
 
+from kubernetes import client, config
+
 import toml
 
 import os
@@ -18,8 +20,6 @@ class Iotslice(Base):
     """The IoT Slice command."""
 
     def create(self):
-        print('Creating IoT Slice:',self.options['--name'],self.options['--edge'],self.options['--cloud'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
         config_path = self.options['--configfile']
 
@@ -34,17 +34,42 @@ class Iotslice(Base):
 
         iotslices = iotslice
 
-        if os.path.exists(config_path):
-           with open(config_path,'r') as f:
-              config = toml.load(f)
-              f.close
-              if config.get('iotslices') != None:
-                  iotslices = config['iotslices']
-                  iotslices.update(iotslice)
+        if not os.path.exists(config_path):
+           print('Clusters do not exist')
+           return
+
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+           if config.get('iotslices') != None:
+               iotslices = config['iotslices']
+               iotslices.update(iotslice)
+
+        clusters = config.get('k8sclusters')
+ 
+        if clusters == None:
+           print('Clusters do not exist')
+           return
+
+        edge = clusters.get(self.options['--edge'])
+
+        if edge == None:
+           print('Edge cluster does not exist')
+           return
+
+        cloud = clusters.get(self.options['--cloud'])
+
+        if cloud == None:
+           print('Cloud cluster does not exist')
+           return
 
         config.update({'iotslices':iotslices})
         with open(config_path,'w+') as f:
            toml.dump(config,f)
+
+        print('Creating IoT Slice:',self.options['--name'],self.options['--edge'],self.options['--cloud'])
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
 
     def delete(self):
 

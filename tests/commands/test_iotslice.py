@@ -24,8 +24,8 @@ class TestSlice(TestCase):
 
     def test_returns_iotslice_create(self):
         name='slice1'
-        edge='cluster1'
-        server='cluster2'
+        edge='test1'
+        server='test1'
         operation='create'
         configfile='./tests/conf/iotorch.toml'
         text= 'Creating IoT Slice: ' + name + ' ' + edge + ' ' + server
@@ -36,17 +36,49 @@ class TestSlice(TestCase):
         self.assertTrue(edge.encode('utf-8') in output)
 
     def test_returns_iotslice_create_file_does_not_exist(self):
-        name='slice1'
-        edge='cluster1'
-        server='cluster2'
+        name='slice2'
+        edge='test1'
+        server='test1'
         operation='create'
-        configfile='./tests/conf/iotorch_test.toml'
-        text= 'Creating IoT Slice: ' + name + ' ' + edge + ' ' + server
+        configfile='./tests/conf/ghost.toml'
+        text= 'Clusters do not exist'
         output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--edge='+edge,'--cloud='+server, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
+        text= 'Nothing to get'
         output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
-        self.assertTrue(edge.encode('utf-8') in output)
+        self.assertTrue(text.encode('utf-8') in output)
+
+    def test_returns_iotslice_create_edge_cluster_does_not_exist(self):
+        name='slice3'
+        edge='ghost'
+        server='test1'
+        operation='create'
+        configfile='./tests/conf/iotorch.toml'
+        text= 'Edge cluster does not exist'
+        output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--edge='+edge,'--cloud='+server, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
+        operation='get'
+        text= 'Nothing to get'
+        output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        print(output)
+        self.assertTrue(text.encode('utf-8') in output)
+
+    def test_returns_iotslice_create_cloud_cluster_does_not_exist(self):
+        name='slice4'
+        edge='test1'
+        server='ghost'
+        operation='create'
+        configfile='./tests/conf/iotorch.toml'
+        text= 'Cloud cluster does not exist'
+        output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--edge='+edge,'--cloud='+server, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
+        operation='get'
+        text= 'Nothing to get'
+        output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        print(output)
+        self.assertTrue(text.encode('utf-8') in output)
+
 
     def test_returns_iotslice_delete(self):
         name='test1'

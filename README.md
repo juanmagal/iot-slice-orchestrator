@@ -16,7 +16,7 @@ Installation
 
 In order to install the library (*and all development dependencies*), run the following command:
 
-    $ pip install -e .[test]
+    $ pip3 install -e .[test]
 
 Usage
 -----

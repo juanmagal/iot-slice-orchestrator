@@ -100,7 +100,7 @@ Testing
 -------
 Execute the following command to execute all tests
 
-    $ python setup.py test
+    $ python3 setup.py test
 
 This will trigger `py.test <http://pytest.org/latest/>`_, along with its popular
 `coverage <https://pypi.python.org/pypi/pytest-cov>`_ plugin.

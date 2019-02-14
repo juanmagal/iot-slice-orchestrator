@@ -71,33 +71,28 @@ This is a fairly complete initial configuration example:
     # List of IoT devices
     [iotdevices]
         [iotdevice.test]
-        name = "test"
         gateway = "test"
     
     # List of configured kubernetes clusters
     [k8sclusters]
         [k8scluster.test]
-        name = "test"
         ip = "127.0.0.1"
    
     # List of IoT slices
     [iotslices]
         [iotslice.test]
-        name = "test"
         edge = "test"
         cloud = "test"
     
     # List of IoT Gateways
     [iotgateways]
         [iotgateway.test]
-        name = "test"
         slice = "test"
         cluster = "test"
     
     # List of IoT Servers
     [iotservers]
         [iotserver.test]
-        name = "test"
         slice = "test"
         cluster = "test"
         

@@ -16,7 +16,7 @@ Installation
 
 In order to install the library (*and all development dependencies*), run the following command:
 
-    $ pip install -e .[test]
+    $ pip3 install -e .[test]
 
 Usage
 -----
@@ -25,7 +25,7 @@ The following commands can be executed:
 
 For configuration of Kubernetes clusters where IoT Gateways and Servers will be deployed:
 
-    $ iotorch k8scluster create --name=<name> --ip=<ipaddress>
+    $ iotorch k8scluster create --name=<name> --ip=<ipaddress> [--k8sconfigfile=<configfile>]
     $ iotorch k8scluster delete --name=<name>
     $ iotorch k8scluster get --name=<name>
     $ iotorch k8scluster list
@@ -71,33 +71,28 @@ This is a fairly complete initial configuration example:
     # List of IoT devices
     [iotdevices]
         [iotdevice.test]
-        name = "test"
         gateway = "test"
     
     # List of configured kubernetes clusters
     [k8sclusters]
         [k8scluster.test]
-        name = "test"
         ip = "127.0.0.1"
    
     # List of IoT slices
     [iotslices]
         [iotslice.test]
-        name = "test"
         edge = "test"
         cloud = "test"
     
     # List of IoT Gateways
     [iotgateways]
         [iotgateway.test]
-        name = "test"
         slice = "test"
         cluster = "test"
     
     # List of IoT Servers
     [iotservers]
         [iotserver.test]
-        name = "test"
         slice = "test"
         cluster = "test"
         
@@ -105,7 +100,7 @@ Testing
 -------
 Execute the following command to execute all tests
 
-    $ python setup.py test
+    $ python3 setup.py test
 
 This will trigger `py.test <http://pytest.org/latest/>`_, along with its popular
 `coverage <https://pypi.python.org/pypi/pytest-cov>`_ plugin.

@@ -1,7 +1,7 @@
 """
 iotorch k8scluster
 
-  Usage:  iotorch k8scluster [create|delete|get|list] [--name=<name>] [--ip=<ipaddress>] [--configfile=<name>]  
+  Usage:  iotorch k8scluster [create|delete|get|list] [--name=<name>] [--ip=<ipaddress>] [--k8sconfigfile=<configfile>] [--configfile=<name>]  
 
 """
 from json import dumps
@@ -28,12 +28,74 @@ class K8scluster(Base):
               print('Wrong IP Address format')
               return
         
-        print('Creating k8s cluster:',self.options['--name'],self.options['--ip'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))        
+        k8s_config_path = self.options['--k8sconfigfile']
+
+        if k8s_config_path and (not os.path.exists(k8sconfig_path)):
+           print('Kubernetes config path does not exist')            
+
+        print('Creating k8s cluster:',self.options['--name'],self.options['--ip'],self.options['--k8sconfigfile'])
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        clusterparams = {'ip':self.options['--ip'],'k8sconfigfile':self.options['--k8sconfigfile']}
+
+        cluster = {self.options['--name']:clusterparams}
+
+        config = {}
+
+        clusters = cluster
+
+        if os.path.exists(config_path):
+           with open(config_path,'r') as f:
+              config = toml.load(f)
+              f.close
+              if config.get('k8sclusters') != None:
+                 clusters = config['k8sclusters']
+                 clusters.update(cluster)
+
+        config.update({'k8sclusters':clusters})
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
 
     def delete(self):
+
         print('Deleting k8s cluster:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        if not os.path.exists(config_path):
+           print('Nothing to delete')
+           return
+
+        config = {}
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+
+        if config.get('k8sclusters') == None:
+           print('Nothing to delete')
+           return
+
+        clusters = config.pop('k8sclusters')
+
+        if clusters.get(self.options['--name']) == None:
+           print('Nothing to delete')
+           return
+
+        cluster = clusters.pop(self.options['--name'])
+
+        config.update({'k8sclusters:':clusters})
+
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
 
     def get(self):
         config_path = self.options['--configfile']
@@ -47,6 +109,9 @@ class K8scluster(Base):
            with open(config_path) as f:
                config = toml.load(f)
                clusters = config.get('k8sclusters')
+               if clusters == None:
+                   print('Nothing to get')
+                   return
                cluster = clusters.get(self.options['--name'])
                if cluster == None:
                    print('Nothing to get')

@@ -27,9 +27,9 @@ class Iotdevice(Base):
         if (not config_path):
            config_path='./iotorch.toml'
 
-        iotgateway = {'gateway':self.options['--gateway']}
+        deviceparams = {'gateway':self.options['--gateway']}
 
-        device = {self.options['--name']:iotgateway}
+        device = {self.options['--name']:deviceparams}
 
         config = {}
 
@@ -38,15 +38,11 @@ class Iotdevice(Base):
         if os.path.exists(config_path):
            with open(config_path,'r') as f:
               config = toml.load(f)
-              print(config)
               devices = config['iotdevices']
-              print(devices)
               devices.update(device)
-              print(devices)
               f.close
        
         config.update({'iotdevices':devices})
-        print(config)
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
@@ -66,21 +62,24 @@ class Iotdevice(Base):
         config = {}
         with open(config_path,'r') as f:
            config = toml.load(f)
-           print(config)
            f.close
 
+        if config.get('iotdevices') == None:
+           print('Nothing to delete')
+           return
+	  
         devices = config.pop('iotdevices')
-        print(devices)
+
+        if devices.get(self.options['--name']) == None:
+           print('Nothing to delete')
+           return
+
         device = devices.pop(self.options['--name'])
-        config.update({'iotdevices':devices})
-        print(devices)
 
         config.update({'iotdevices':devices})
-        print(config)
+
         with open(config_path,'w+') as f:
            toml.dump(config,f)
-
-
 
     def get(self):
         config_path = self.options['--configfile']

@@ -21,9 +21,67 @@ class Iotserver(Base):
         print('Creating IoT Server:',self.options['--name'],self.options['--cluster'],self.options['--slice'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        serverparams = {'cluster':self.options['--cluster'],'slice':self.options['--slice']}
+
+        server = {self.options['--name']:serverparams}
+
+        config = {}
+
+        servers = server
+
+        if os.path.exists(config_path):
+           with open(config_path,'r') as f:
+              config = toml.load(f)
+              f.close
+              if config.get('iotservers') != None:
+                  servers = config.get('iotservers') 
+                  servers.update(server)
+
+        config.update({'iotservers':servers})
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
+
     def delete(self):
+
         print('Deleting IoT Server:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        if not os.path.exists(config_path):
+           print('Nothing to delete')
+           return
+
+        config = {}
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+
+        if config.get('iotservers') == None:
+           print('Nothing to delete')
+           return
+
+        servers = config.pop('iotservers')
+
+        if servers.get(self.options['--name']) == None:
+           print('Nothing to delete')
+           return
+
+        server = servers.pop(self.options['--name'])
+
+        config.update({'iotservers':servers})
+
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
+
 
     def get(self):
         config_path = self.options['--configfile']
@@ -37,6 +95,9 @@ class Iotserver(Base):
            with open(config_path) as f:
                config = toml.load(f)
                servers = config.get('iotservers')
+               if servers == None:
+                   print('Nothing to get')
+                   return
                server = servers.get(self.options['--name'])
                if server == None:
                    print('Nothing to get')

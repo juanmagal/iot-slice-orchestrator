@@ -21,9 +21,66 @@ class Iotslice(Base):
         print('Creating IoT Slice:',self.options['--name'],self.options['--edge'],self.options['--cloud'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        sliceparams = {'edge':self.options['--edge'],'cloud':self.options['--cloud']}
+
+        iotslice = {self.options['--name']:sliceparams}
+
+        config = {}
+
+        iotslices = iotslice
+
+        if os.path.exists(config_path):
+           with open(config_path,'r') as f:
+              config = toml.load(f)
+              f.close
+              if config.get('iotslices') != None:
+                  iotslices = config['iotslices']
+                  iotslices.update(iotslice)
+
+        config.update({'iotslices':iotslices})
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
+
     def delete(self):
+
         print('Deleting IoT Slice:',self.options['--name'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        if not os.path.exists(config_path):
+           print('Nothing to delete')
+           return
+
+        config = {}
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+
+        if config.get('iotslices') == None:
+           print('Nothing to delete')
+           return
+
+        iotslices = config.pop('iotslices')
+
+        if iotslices.get(self.options['--name']) == None:
+           print('Nothing to delete')
+           return
+
+        iotslice = iotslices.pop(self.options['--name'])
+
+        config.update({'iotslices':iotslices})
+
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
 
     def get(self):
         config_path = self.options['--configfile']
@@ -37,6 +94,9 @@ class Iotslice(Base):
            with open(config_path) as f:
                config = toml.load(f)
                slices = config.get('iotslices')
+               if slices == None:
+                  print('Nothing to get')
+                  return
                iotslice = slices.get(self.options['--name'])
                if iotslice == None:
                    print('Nothing to get')

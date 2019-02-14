@@ -61,27 +61,19 @@ class TestIoTDevice(TestCase):
     def test_returns_iotdevice_delete_device_does_not_exist(self):
         name='ghost'
         operation='delete'
-        text='Deleting IoT Device: ' + name
+        text='Nothing to delete'
         configfile='./tests/conf/iotorch.toml'
-        output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
-        self.assertTrue(text.encode('utf-8') in output)
-        operation='get'
-        text='Nothing to get'
         output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
 
     def test_returns_iotdevice_delete_file_does_not_exist(self):
         name='device1'
         operation='delete'
-        text='Deleting IoT Device: ' + name
+        text='Nothing to delete'
         configfile='./tests/conf/iotorch_not_exist.toml'
         output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
-        operation='get'
-        text='Nothing to get'
-        output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
-        self.assertTrue(text.encode('utf-8') in output)
-
+ 
     def test_returns_iotdevice_list(self):
         name='test'
         operation='list'
@@ -96,4 +88,3 @@ class TestIoTDevice(TestCase):
         text='Nothing to list'
         output = popen(['iotorch', 'iotdevice', operation, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
-

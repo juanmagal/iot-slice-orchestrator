@@ -28,8 +28,9 @@ class TestIotGateway(TestCase):
         iotslice='test1'
         operation='create'
         configfile='./tests/conf/iotorch.toml'
-        text= 'Creating IoT Gateway: ' + name + ' ' + cluster + ' ' + iotslice
+        text= "IoT Gateway " + name + " created"
         output = popen(['iotorch', 'iotgateway', operation, '--name='+name, '--cluster='+cluster,'--slice='+iotslice, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        print(output)
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
         output = popen(['iotorch', 'iotgateway', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
@@ -83,7 +84,7 @@ class TestIotGateway(TestCase):
         server='test1'
         operation='attach'
         configfile='./tests/conf/iotorch.toml'
-        text= 'Attaching IoT Gateway: ' + name + ' to IoT Server ' + server
+        text= "IoT Gateway " + name + " attached to IoT Server " + server
         output = popen(['iotorch', 'iotgateway', operation, '--name='+name, '--server='+server, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
@@ -120,7 +121,7 @@ class TestIotGateway(TestCase):
     def test_returns_iotgateway_delete(self):
         name='gateway1'
         operation='delete'
-        text='Deleting IoT Gateway: ' + name
+        text= "IoT Gateway " + name + " deleted"
         configfile='./tests/conf/iotorch.toml'
         output = popen(['iotorch', 'iotgateway', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)

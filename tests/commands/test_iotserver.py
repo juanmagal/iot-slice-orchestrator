@@ -28,7 +28,7 @@ class TestIotServer(TestCase):
         iotslice='test1'
         operation='create'
         configfile='./tests/conf/iotorch.toml'
-        text= 'Creating IoT Server: ' + name + ' ' + cluster + ' ' + iotslice
+        text= "IoT Server " + name + " created"
         output = popen(['iotorch', 'iotserver', operation, '--name='+name, '--cluster='+cluster,'--slice='+iotslice,'--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
@@ -80,7 +80,7 @@ class TestIotServer(TestCase):
     def test_returns_iotserver_delete(self):
         name='server1'
         operation='delete'
-        text='Deleting IoT Server: ' + name
+        text= "IoT Server " + name + " deleted"
         configfile='./tests/conf/iotorch.toml'
         output = popen(['iotorch', 'iotserver', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)

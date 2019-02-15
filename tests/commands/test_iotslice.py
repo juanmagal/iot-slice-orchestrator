@@ -28,7 +28,7 @@ class TestSlice(TestCase):
         server='test1'
         operation='create'
         configfile='./tests/conf/iotorch.toml'
-        text= 'Creating IoT Slice: ' + name + ' ' + edge + ' ' + server
+        text= "IoT Slice " + name + " created"
         output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--edge='+edge,'--cloud='+server, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
@@ -83,7 +83,7 @@ class TestSlice(TestCase):
     def test_returns_iotslice_delete(self):
         name='test1'
         operation='delete'
-        text='Deleting IoT Slice: ' + name
+        text= "IoT Slice " + name + " deleted"        
         configfile='./tests/conf/iotorch.toml'
         output = popen(['iotorch', 'iotslice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)

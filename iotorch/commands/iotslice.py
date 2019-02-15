@@ -28,7 +28,9 @@ class Iotslice(Base):
 
         sliceparams = {'edge':self.options['--edge'],'cloud':self.options['--cloud']}
 
-        iotslice = {self.options['--name']:sliceparams}
+        iotslicename = self.options['--name']
+
+        iotslice = {iotslicename:sliceparams}
 
         config = {}
 
@@ -67,9 +69,7 @@ class Iotslice(Base):
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Creating IoT Slice:',self.options['--name'],self.options['--edge'],self.options['--cloud'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
-
+        print('IoT Slice %s created' %iotslicename)
 
     def delete(self):
 
@@ -82,6 +82,8 @@ class Iotslice(Base):
            print('Nothing to delete')
            return
 
+        iotslicename = self.options['--name']
+
         config = {}
         with open(config_path,'r') as f:
            config = toml.load(f)
@@ -93,22 +95,21 @@ class Iotslice(Base):
 
         iotslices = config.pop('iotslices')
 
-        if iotslices.get(self.options['--name']) == None:
+        if iotslices.get(iotslicename) == None:
            print('Nothing to delete')
            return
 
-        iotslice = iotslices.pop(self.options['--name'])
+        iotslice = iotslices.pop(iotslicename)
 
         config.update({'iotslices':iotslices})
 
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Deleting IoT Slice:',self.options['--name'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
-
+        print('IoT Slice %s deleted' %iotslicename)
 
     def get(self):
+        
         config_path = self.options['--configfile']
 
         if (not config_path):

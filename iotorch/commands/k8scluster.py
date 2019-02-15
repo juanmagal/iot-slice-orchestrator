@@ -20,10 +20,12 @@ class K8scluster(Base):
     """The k8s cluster command."""
 
     def create(self):
+      
+        clustername = self.options['--name']
         ipaddr=self.options['--ip']
         if ipaddr:
            try:
-              ip = ipaddress.ip_address(ipaddr)
+              ip = ipaddress.ip_address(unicode(ipaddr, "utf-8"))
            except ValueError:
               print('Wrong IP Address format')
               return
@@ -33,9 +35,6 @@ class K8scluster(Base):
         if k8s_config_path and (not os.path.exists(k8sconfig_path)):
            print('Kubernetes config path does not exist')            
 
-        print('Creating k8s cluster:',self.options['--name'],self.options['--ip'],self.options['--k8sconfigfile'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
-
         config_path = self.options['--configfile']
 
         if (not config_path):
@@ -43,7 +42,7 @@ class K8scluster(Base):
 
         clusterparams = {'ip':self.options['--ip'],'k8sconfigfile':self.options['--k8sconfigfile']}
 
-        cluster = {self.options['--name']:clusterparams}
+        cluster = {clustername:clusterparams}
 
         config = {}
 
@@ -61,10 +60,11 @@ class K8scluster(Base):
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
+        print('k8s cluster %s created' %clustername)
+
     def delete(self):
 
-        print('Deleting k8s cluster:',self.options['--name'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+        clustername = self.options['--name']
 
         config_path = self.options['--configfile']
 
@@ -86,16 +86,19 @@ class K8scluster(Base):
 
         clusters = config.pop('k8sclusters')
 
-        if clusters.get(self.options['--name']) == None:
+        if clusters.get(clustername) == None:
            print('Nothing to delete')
            return
 
-        cluster = clusters.pop(self.options['--name'])
+        cluster = clusters.pop(clustername)
 
         config.update({'k8sclusters:':clusters})
 
         with open(config_path,'w+') as f:
            toml.dump(config,f)
+
+        print('k8s cluster %s deleted' %clustername)
+
 
     def get(self):
         config_path = self.options['--configfile']

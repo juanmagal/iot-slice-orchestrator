@@ -34,9 +34,10 @@ class TestK8sCluster(TestCase):
         name='cluster1'
         ipaddress='127.0.0.1'
         operation='create'
-        text= 'Creating k8s cluster: ' + name + ' ' + ipaddress
+        text= "k8s cluster " + name + " created"
         configfile='./tests/conf/iotorch.toml'
         output = popen(['iotorch', 'k8scluster', operation, '--name='+name, '--ip='+ipaddress, '--configfile='+configfile],stdout=PIPE).communicate()[0]
+        print(output)
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
         output = popen(['iotorch', 'k8scluster', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
@@ -55,7 +56,7 @@ class TestK8sCluster(TestCase):
         name='cluster1'
         ipaddress='127.0.0.1'
         operation='create'
-        text= 'Creating k8s cluster: ' + name + ' ' + ipaddress
+        text= "k8s cluster " + name + " created"
         configfile='./tests/conf/iotorch_test.toml'
         output = popen(['iotorch', 'k8scluster', operation, '--name='+name, '--ip='+ipaddress, '--configfile='+configfile],stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
@@ -66,7 +67,7 @@ class TestK8sCluster(TestCase):
     def test_returns_k8scluster_delete(self):
         operation='delete'
         name='cluster1'
-        text= 'Deleting k8s cluster: ' + name
+        text= "k8s cluster " + name + " deleted"
         configfile='./tests/conf/iotorch.toml'
         output = popen(['iotorch', 'k8scluster', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)

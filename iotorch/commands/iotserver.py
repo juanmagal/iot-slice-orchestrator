@@ -23,10 +23,12 @@ class Iotserver(Base):
 
         if (not config_path):
            config_path='./iotorch.toml'
+  
+        servername = self.options['--name']
 
         serverparams = {'cluster':self.options['--cluster'],'slice':self.options['--slice']}
 
-        server = {self.options['--name']:serverparams}
+        server = {servername:serverparams}
 
         config = {}
 
@@ -71,12 +73,13 @@ class Iotserver(Base):
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Creating IoT Server:',self.options['--name'],self.options['--cluster'],self.options['--slice'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+        print('IoT Server %s created' %servername)
 
     def delete(self):
 
         config_path = self.options['--configfile']
+
+        servername = self.options['--name']
 
         if (not config_path):
            config_path='./iotorch.toml'
@@ -96,19 +99,18 @@ class Iotserver(Base):
 
         servers = config.pop('iotservers')
 
-        if servers.get(self.options['--name']) == None:
+        if servers.get(servername) == None:
            print('Nothing to delete')
            return
 
-        server = servers.pop(self.options['--name'])
+        server = servers.pop(servername)
 
         config.update({'iotservers':servers})
 
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Deleting IoT Server:',self.options['--name'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+        print('IoT Server %s deleted' %servername)
 
     def get(self):
         config_path = self.options['--configfile']

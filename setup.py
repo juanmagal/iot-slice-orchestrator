@@ -28,6 +28,7 @@ class RunTests(Command):
 
     def run(self):
         """Run all tests!"""
+        print("run tests")
         errno = call(['py.test', '--cov=iotorch', '--cov-report=term-missing'])
         raise SystemExit(errno)
 
@@ -57,7 +58,7 @@ setup(
     ],
     keywords = 'cli',
     packages = find_packages(exclude=['docs', 'tests*']),
-    install_requires = ['docopt','toml','kubernetes'],
+    install_requires = ['docopt','toml','kubernetes','pyhelm'],
     extras_require = {
         'test': ['coverage', 'pytest', 'pytest-cov'],
     },

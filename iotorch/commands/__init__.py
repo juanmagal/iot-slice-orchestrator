@@ -1,6 +1,1 @@
-from .hello import *
-from .k8scluster import *
-from .iotdevice import *
-from .iotgateway import *
-from .iotserver import *
-from .iotslice import *
+__version__ ='0.1.0'

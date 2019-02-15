@@ -25,9 +25,11 @@ class Iotgateway(Base):
         if (not config_path):
            config_path='./iotorch.toml'
 
+        gatewayname = self.options['--name']
+
         gatewayparams = {'cluster':self.options['--cluster'],'slice':self.options['--slice']}
 
-        gateway = {self.options['--name']:gatewayparams}
+        gateway = {gatewayname:gatewayparams}
 
         config = {}
 
@@ -43,7 +45,6 @@ class Iotgateway(Base):
            if config.get('iotgateways') != None:
               gateways = config['iotgateways']
               gateways.update(gateway)
-
 
         clusters = config.get('k8sclusters')
 
@@ -73,8 +74,7 @@ class Iotgateway(Base):
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Creating IoT Gateway:',self.options['--name'],self.options['--cluster'],self.options['--slice'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+        print('IoT Gateway %s created' %gatewayname)
 
 
     def delete(self):
@@ -89,6 +89,9 @@ class Iotgateway(Base):
            return
 
         config = {}
+
+        gatewayname = self.options['--name']
+
         with open(config_path,'r') as f:
            config = toml.load(f)
            f.close
@@ -99,24 +102,25 @@ class Iotgateway(Base):
 
         gateways = config.pop('iotgateways')
 
-        if gateways.get(self.options['--name']) == None:
+        if gateways.get(gatewayname) == None:
            print('Nothing to delete')
            return
 
-        gateway = gateways.pop(self.options['--name'])
+        gateway = gateways.pop(gatewayname)
 
         config.update({'iotgateways':gateways})
 
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Deleting IoT Gateway:',self.options['--name'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
-
+        print('IoT Gateway %s deleted' %gatewayname)
 
     def attach(self):
 
         config_path = self.options['--configfile']
+
+        gatewayname = self.options['--name']
+        servername = self.options['--server']
 
         if (not config_path):
            config_path='./iotorch.toml'
@@ -126,6 +130,7 @@ class Iotgateway(Base):
            return
 
         config = {}
+
         with open(config_path,'r') as f:
            config = toml.load(f)
            f.close
@@ -136,11 +141,11 @@ class Iotgateway(Base):
 
         gateways = config.pop('iotgateways')
         
-        if gateways.get(self.options['--name']) == None:
+        if gateways.get(gatewayname) == None:
            print('Nothing to update')
            return
 
-        gateway = gateways.pop(self.options['--name'])
+        gateway = gateways.pop(gatewayname)
 
         if gateway == None:
            print('Nothing to update')
@@ -152,15 +157,15 @@ class Iotgateway(Base):
            print('IoT Server does not exist')
            return
 
-        server = servers.get(self.options['--server'])
+        server = servers.get(servername)
 
         if server == None:
            print('IoT Server does not exist')
            return
 
-        gateway['server'] = self.options['--server']
+        gateway['server'] = servername
   
-        gateway = {self.options['--name']:gateway}
+        gateway = {gatewayname:gateway}
  
         gateways.update(gateway)
 
@@ -169,9 +174,7 @@ class Iotgateway(Base):
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-        print('Attaching IoT Gateway:',self.options['--name'],'to IoT Server',self.options['--server'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
-
+        print('IoT Gateway %s attached to IoT Server %s' %(gatewayname,servername))
 
     def get(self):
         config_path = self.options['--configfile']

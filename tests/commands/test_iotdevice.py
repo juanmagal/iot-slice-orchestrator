@@ -27,7 +27,7 @@ class TestIoTDevice(TestCase):
         gateway='gateway1'
         operation='create'
         configfile='./tests/conf/iotorch.toml'
-        text= 'Creating IoT Device: ' + name
+        text= "IoT Device " + name + " created"
         output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--gateway='+gateway, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
@@ -39,7 +39,7 @@ class TestIoTDevice(TestCase):
         gateway='gateway1'
         operation='create'
         configfile='./tests/conf/iotorch_test.toml'
-        text= 'Creating IoT Device: ' + name
+        text= "IoT Device " + name + " created"
         output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--gateway='+gateway, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
         operation='get'
@@ -49,7 +49,7 @@ class TestIoTDevice(TestCase):
     def test_returns_iotdevice_delete(self):
         name='device1'
         operation='delete'
-        text='Deleting IoT Device: ' + name
+        text= "IoT Device " + name + " deleted"
         configfile='./tests/conf/iotorch.toml'
         output = popen(['iotorch', 'iotdevice', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)

@@ -73,9 +73,6 @@ class Iotslice(Base):
 
     def delete(self):
 
-        print('Deleting IoT Slice:',self.options['--name'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
-
         config_path = self.options['--configfile']
 
         if (not config_path):
@@ -106,6 +103,10 @@ class Iotslice(Base):
 
         with open(config_path,'w+') as f:
            toml.dump(config,f)
+
+        print('Deleting IoT Slice:',self.options['--name'])
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
 
     def get(self):
         config_path = self.options['--configfile']

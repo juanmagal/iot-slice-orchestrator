@@ -18,8 +18,6 @@ class Iotserver(Base):
     """The IoT Server command."""
 
     def create(self):
-        print('Creating IoT Server:',self.options['--name'],self.options['--cluster'],self.options['--slice'])
-        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
         config_path = self.options['--configfile']
 
@@ -34,22 +32,49 @@ class Iotserver(Base):
 
         servers = server
 
-        if os.path.exists(config_path):
-           with open(config_path,'r') as f:
-              config = toml.load(f)
-              f.close
-              if config.get('iotservers') != None:
-                  servers = config.get('iotservers') 
-                  servers.update(server)
+        if not os.path.exists(config_path):
+           print('Cluster does not exist')
+           return
+
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+           if config.get('iotservers') != None:
+               servers = config.get('iotservers') 
+               servers.update(server)
+
+        clusters = config.get('k8sclusters')
+
+        if clusters == None:
+           print('Cluster does not exist')
+           return
+
+        cluster = clusters.get(self.options['--cluster'])
+
+        if cluster == None:
+           print('Cluster does not exist')
+           return
+
+        iotslices = config.get('iotslices')
+
+        if iotslices == None:
+           print('Slice does not exist')
+           return
+
+        iotslice = iotslices.get(self.options['--slice'])
+
+        if iotslice == None:
+           print('Slice does not exist')
+           return
 
         config.update({'iotservers':servers})
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
-    def delete(self):
-
-        print('Deleting IoT Server:',self.options['--name'])
+        print('Creating IoT Server:',self.options['--name'],self.options['--cluster'],self.options['--slice'])
         print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
+
+    def delete(self):
 
         config_path = self.options['--configfile']
 
@@ -82,6 +107,8 @@ class Iotserver(Base):
         with open(config_path,'w+') as f:
            toml.dump(config,f)
 
+        print('Deleting IoT Server:',self.options['--name'])
+        print('You supplied the following options:', dumps(self.options, indent=2, sort_keys=True))
 
     def get(self):
         config_path = self.options['--configfile']

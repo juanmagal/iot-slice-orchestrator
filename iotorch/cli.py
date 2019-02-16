@@ -26,6 +26,7 @@ from docopt import docopt
 
 from . import __version__ as VERSION
 
+from . import utils 
 
 def main():
     """Main CLI entrypoint."""

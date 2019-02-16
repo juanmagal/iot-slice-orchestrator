@@ -1,7 +1,10 @@
 """
 iotorch iotdevice
 
-  Usage:  iotorch iotdevice [create|delete|get|list] [--name=<name>] [--gateway=<gateway>] [--configfile=<name>]   
+  Usage:
+    iotorch iotdevice create --name=<name> --gateway=<gateway> [--configfile=<name>]   
+    iotorch iotdevice [delete|get] --name=<name> [--configfile=<name>]
+    iotorch iotdevice list [--configfile=<name>]
 
 """
 
@@ -140,5 +143,4 @@ class Iotdevice(Base):
             self.list()
         else:
             print("Option not implemented")
-            raise NotImplementedError('Option not implemented')
 

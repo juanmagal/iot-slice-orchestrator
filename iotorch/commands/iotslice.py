@@ -1,7 +1,10 @@
 """
 iotorch iotslice
 
-  Usage:  iotorch iotslice [create|delete|get|list] [--name=<name>] [--edge=<edgecluster>] [--cloud=<cloudcluster>] [--configfile=<name>] 
+  Usage:
+    iotorch iotslice create --name=<name> --edge=<edgecluster> --cloud=<cloudcluster> [--configfile=<name>] 
+    iotorch iotslice [get|delete] --name=<name> [--configfile=<name>]
+    iotorch iotslice list [--configfile=<name>]
 
 """
 from json import dumps
@@ -11,6 +14,8 @@ from .base import Base
 from docopt import docopt
 
 from kubernetes import client, config
+
+from ..utils import k8sutils
 
 import toml
 
@@ -26,9 +31,11 @@ class Iotslice(Base):
         if (not config_path):
            config_path='./iotorch.toml'
 
-        sliceparams = {'edge':self.options['--edge'],'cloud':self.options['--cloud']}
-
         iotslicename = self.options['--name']
+        edgeclustername = self.options['--edge']
+        cloudclustername = self.options['--cloud']
+
+        sliceparams = {'edge':edgeclustername,'cloud':cloudclustername}
 
         iotslice = {iotslicename:sliceparams}
 
@@ -53,17 +60,26 @@ class Iotslice(Base):
            print('Clusters do not exist')
            return
 
-        edge = clusters.get(self.options['--edge'])
+        edge = clusters.get(edgeclustername)
 
         if edge == None:
            print('Edge cluster does not exist')
            return
 
-        cloud = clusters.get(self.options['--cloud'])
+        cloud = clusters.get(cloudclustername)
 
         if cloud == None:
            print('Cloud cluster does not exist')
            return
+
+        if not k8sutils.createnamespace(iotslicename,edgeclustername):
+           print('Iot Slice not created in Edge Cluster')
+           return
+
+        if edgeclustername != cloudclustername:
+           if not k8sutils.createnamespace(iotslicename,cloudclustername):
+             print('Iot Slice not created in Cloud Cluster')
+             return
 
         config.update({'iotslices':iotslices})
         with open(config_path,'w+') as f:
@@ -100,6 +116,18 @@ class Iotslice(Base):
            return
 
         iotslice = iotslices.pop(iotslicename)
+
+        edgeclustername = iotslice.get('edge')
+        cloudclustername = iotslice.get('edge')
+
+        if not k8sutils.deletenamespace(iotslicename,edgeclustername):
+           print('Iot Slice not deleted in Edge Cluster')
+           return
+
+        if edgeclustername != cloudclustername:
+           if not k8sutils.deletenamespace(iotslicename,cloudclustername):
+             print('Iot Slice not created in Cloud Cluster')
+             return
 
         config.update({'iotslices':iotslices})
 

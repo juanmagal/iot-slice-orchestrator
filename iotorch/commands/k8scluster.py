@@ -133,15 +133,13 @@ class K8scluster(Base):
         else:
            with open(config_path) as f:
                config = toml.load(f)
-               clusters = config.get('k8scluxters')
+               clusters = config.get('k8sclusters')
                if clusters == None:
                   print('Nothing to list')
                else:
-                  print (list(clusters.keys()))
+                  print(list(clusters.keys()))
 
     def run(self):
-
-        print(self.options)
 
         options = docopt(__doc__)
 

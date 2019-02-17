@@ -61,8 +61,51 @@ To handle IoT Devices and attach them to an IoT Gateway:
 
 Initial Configuration
 ---------------------
+In order to manager different Kubernetes clusters, different contexts must be defined following [kubernetes documentation](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/). Note iotorch will set the right context depending on the cluster to use.
 
-It is possible to define the initial configuration of the system by creating a toml file, whose name by default is ``iotorch.toml`` and shall be located in the same folder from which iotorch commands will be called. This file is updated whenever any of the commands above modify this configuration (e.g. creating or deleting entries)
+One way of doing that is by setting different Kubernetes config files in ``KUBECONFIG`` variable:
+
+    export  KUBECONFIG=$KUBECONFIG:<cluster1_config_file_path>:<cluster2_config_file_path>
+
+It is important to notice same cluster names, context names and user names should not be used for all config files. This is an example of a configuration with two different contexts:
+
+    > kubectl config view
+    
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority-data: DATA+OMITTED
+        server: https://cluster1:6443
+      name: cluster1
+    - cluster:
+        certificate-authority-data: DATA+OMITTED
+        server: https://cluster2:6443
+      name: cluster2
+    contexts:
+    - context:
+        cluster: cluster1
+        user: cluster1-admin
+      name: cluster1
+    - context:
+        cluster: cluster2
+        user: cluster2-admin
+      name: cluster2
+    current-context: cluster2
+    kind: Config
+    preferences: {}
+    users:
+    - name: cluster1-admin
+      user:
+        client-certificate-data: REDACTED
+        client-key-data: REDACTED
+    - name: cluster2-admin
+      user:
+        client-certificate-data: REDACTED
+        client-key-data: REDACTED
+
+Configuration
+-------------
+All the configuration of the system is stored in a toml file, whose name by default is ``iotorch.toml`` and by default is stored in the same folder where the commands are stored.
 
 This is a fairly complete initial configuration example:
 

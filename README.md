@@ -105,7 +105,7 @@ It is important to notice same cluster names, context names and user names shoul
 
 Configuration
 -------------
-All the configuration of the system is stored in a toml file, whose name by default is ``iotorch.toml`` and by default is stored in the same folder where the commands are stored.
+All the configuration of the system is stored in a toml file, whose name by default is ``iotorch.toml`` and by default is stored in the same folder where the commands are executed.
 
 This is a fairly complete initial configuration example:
 

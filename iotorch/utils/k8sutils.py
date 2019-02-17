@@ -2,6 +2,10 @@ from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from urllib3.exceptions import MaxRetryError
 
+from pyhelm.chartbuilder import ChartBuilder
+from pyhelm.tiller import Tiller
+
+
 from . import iotorchutils
 
 
@@ -62,3 +66,40 @@ def deletenamespace(iotslice,cluster,configfile):
        return False
 
     return True
+
+def createiotgatewayincluster(iotslice,cluster,helmpath,configfile):
+
+    clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
+
+    clusterhelmport=iotorchutils.getk8sclusterhelmport(cluster,configfile)
+
+    if clusterip == None:
+       print ("IP Address for cluster %s not found" %cluster)
+       return False
+
+    chartname = "iotgateway"
+
+    releasename = "iotgateway-"+iotslice
+
+    chart = ChartBuilder({'name': chartname, 'source': {'type': 'directory', 'location': helmpath}})
+
+    t = Tiller(host=clusterip,port=clusterhelmport)
+
+    t.install_release(chart.get_helm_chart(), dry_run=False, namespace=iotslice, name=releasename)
+
+    return True
+
+def deleteiotgatewayincluster(iotslice,cluster,configfile):
+
+    clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
+
+    clusterhelmport=iotorchutils.getk8sclusterhelmport(cluster,configfile)
+
+    t = Tiller(host=clusterip,port=clusterhelmport)
+
+    releasename = "iotgateway-"+iotslice
+
+    t.uninstall_release(release=releasename)
+
+    return True
+

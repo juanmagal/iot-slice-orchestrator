@@ -1,7 +1,11 @@
 """
 iotorch iotgateway
 
-  Usage:  iotorch iotgateway  [create|delete|attach|get|list] [--name=<name>] [--cluster=<cluster>] [--slice=<slice>] [--server=<server>] [--configfile=<name>]  
+  Usage:  
+    iotorch iotgateway  create --name=<name> --cluster=<cluster> --slice=<slice> [--helmpath=<path>] [--configfile=<name>]
+    iotorch iotgateway  attach --name=<name> --server=<server> [--configfile=<name>]
+    iotorch iotgateway  [delete|get] --name=<name> [--configfile=<name>]
+    iotorch iotgateway  list [--configfile=<name>]
 
 """
 
@@ -15,6 +19,8 @@ import toml
 
 import os
 
+from ..utils import k8sutils
+
 class Iotgateway(Base):
     """The IoT Gateway command."""
 
@@ -25,9 +31,15 @@ class Iotgateway(Base):
         if (not config_path):
            config_path='./iotorch.toml'
 
+        helm_path = self.options['--helmpath']
+
         gatewayname = self.options['--name']
 
-        gatewayparams = {'cluster':self.options['--cluster'],'slice':self.options['--slice']}
+        clustername = self.options['--cluster']
+
+        slicename = self.options['--slice']
+
+        gatewayparams = {'cluster':clustername,'slice':slicename}
 
         gateway = {gatewayname:gatewayparams}
 
@@ -52,7 +64,7 @@ class Iotgateway(Base):
            print('Cluster does not exist')
            return
 
-        cluster = clusters.get(self.options['--cluster'])
+        cluster = clusters.get(clustername)
 
         if cluster == None:
            print('Cluster does not exist')
@@ -64,10 +76,14 @@ class Iotgateway(Base):
            print('Slice does not exist')
            return
 
-        iotslice = iotslices.get(self.options['--slice'])
+        iotslice = iotslices.get(slicename)
 
         if iotslice == None:
            print('Slice does not exist')
+           return
+
+        if not k8sutils.createiotgatewayincluster(slicename,clustername,helm_path,config_path):
+           print('IoT Gateway not deployed in cluster %s' %cluster)
            return
 
         config.update({'iotgateways':gateways})
@@ -107,6 +123,13 @@ class Iotgateway(Base):
            return
 
         gateway = gateways.pop(gatewayname)
+
+        slicename = gateway.get('slice')
+        clustername = gateway.get('cluster')
+
+        if not k8sutils.deleteiotgatewayincluster(slicename,clustername,config_path):
+           print('IoT Gateway not removed from cluster %s' %cluster)
+           return
 
         config.update({'iotgateways':gateways})
 

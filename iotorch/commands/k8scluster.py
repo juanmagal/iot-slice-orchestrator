@@ -2,7 +2,7 @@
 iotorch k8scluster
 
   Usage:  
-    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--configfile=<name>]  
+    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--k8shelmport=<port>] [--configfile=<name>]  
     iotorch k8scluster [delete|get] --name=<name> [--configfile=<name>]
     iotorch k8scluster list [--configfile=<name>]
 
@@ -32,7 +32,7 @@ class K8scluster(Base):
            except ValueError:
               print('Wrong IP Address format')
               return
-        
+        helmport=self.options['--k8shelmport']
         k8s_context = self.options['--k8scontext']
 
         config_path = self.options['--configfile']
@@ -40,7 +40,7 @@ class K8scluster(Base):
         if (not config_path):
            config_path='./iotorch.toml'
 
-        clusterparams = {'ip':self.options['--ip'],'k8scontext':k8s_context}
+        clusterparams = {'ip':ipaddr,'k8scontext':k8s_context,'helmport':helmport}
 
         cluster = {clustername:clusterparams}
 

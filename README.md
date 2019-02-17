@@ -59,6 +59,22 @@ To handle IoT Devices and attach them to an IoT Gateway:
     $ iotorch iotdevice get --name=<name>
     $ iotorch iotdevice list
 
+Example
+-------
+Examples of iotorch commands:
+
+    iotorch k8scluster create --name=edgecluster --k8scontext=edgecluster-context --ip=10.10.10.10 --k8shelmport=44134
+    iotorch k8scluster create --name=cloudcluster --k8scontext=cloudcluster-context --ip=10.10.10.11 --k8shelmport=44134
+    iotorch iotslice create --name=testslice --edge=edgecluster --cloud=cloudcluster
+    iotorch iotgateway create --name gwtest --cluster=edgecluster --slice=testslice --helmpath=/home/helm/gatewaychart
+    iotorch iotserver create --name=servertest --cluster=cloudcluster --slice=testslice --helmpath=/home/helm/serverchart
+    
+    iotorch iotserver delete --name=servertest
+    iotorch iotgateway delete --name gwtest
+    iotorch iotslice delete --name=testslice
+    iotorch k8scluster delete --name=edgecluster
+    iotorch k8scluster delete --name=cloudcluster
+
 Initial Configuration
 ---------------------
 In order to manager different Kubernetes clusters, different contexts must be defined following [kubernetes documentation](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/). Note iotorch will set the right context depending on the cluster to use.
@@ -75,30 +91,30 @@ It is important to notice same cluster names, context names and user names shoul
     clusters:
     - cluster:
         certificate-authority-data: DATA+OMITTED
-        server: https://cluster1:6443
-      name: cluster1
+        server: https://edgecluster:6443
+      name: edgecluster
     - cluster:
         certificate-authority-data: DATA+OMITTED
-        server: https://cluster2:6443
-      name: cluster2
+        server: https://cloudcluster:6443
+      name: cloudcluster
     contexts:
     - context:
-        cluster: cluster1
-        user: cluster1-admin
-      name: cluster1
+        cluster: edgecluster
+        user: edgecluster-admin
+      name: edgeclustercontext
     - context:
-        cluster: cluster2
-        user: cluster2-admin
-      name: cluster2
+        cluster: cloudcluster
+        user: cloudcluster-admin
+      name: cloudclustercontext
     current-context: cluster2
     kind: Config
     preferences: {}
     users:
-    - name: cluster1-admin
+    - name: edgecluster-admin
       user:
         client-certificate-data: REDACTED
         client-key-data: REDACTED
-    - name: cluster2-admin
+    - name: cloudcluster-admin
       user:
         client-certificate-data: REDACTED
         client-key-data: REDACTED

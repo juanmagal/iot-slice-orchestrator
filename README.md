@@ -25,7 +25,7 @@ The following commands can be executed:
 
 For configuration of Kubernetes clusters where IoT Gateways and Servers will be deployed:
 
-    $ iotorch k8scluster create --name=<name> --ip=<ipaddress> [--k8sconfigfile=<configfile>]
+    $ iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>]
     $ iotorch k8scluster delete --name=<name>
     $ iotorch k8scluster get --name=<name>
     $ iotorch k8scluster list

@@ -58,7 +58,7 @@ setup(
     ],
     keywords = 'cli',
     packages = find_packages(exclude=['docs', 'tests*']),
-    install_requires = ['docopt','toml','kubernetes','pyhelm'],
+    install_requires = ['docopt','toml','kubernetes','pyhelm','requests'],
     extras_require = {
         'test': ['coverage', 'pytest', 'pytest-cov'],
     },

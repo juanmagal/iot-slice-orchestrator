@@ -1,7 +1,10 @@
 """
 iotorch k8scluster
 
-  Usage:  iotorch k8scluster [create|delete|get|list] [--name=<name>] [--ip=<ipaddress>] [--k8sconfigfile=<configfile>] [--configfile=<name>]  
+  Usage:  
+    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--configfile=<name>]  
+    iotorch k8scluster [delete|get] --name=<name> [--configfile=<name>]
+    iotorch k8scluster list [--configfile=<name>]
 
 """
 from json import dumps
@@ -30,17 +33,14 @@ class K8scluster(Base):
               print('Wrong IP Address format')
               return
         
-        k8s_config_path = self.options['--k8sconfigfile']
-
-        if k8s_config_path and (not os.path.exists(k8sconfig_path)):
-           print('Kubernetes config path does not exist')            
+        k8s_context = self.options['--k8scontext']
 
         config_path = self.options['--configfile']
 
         if (not config_path):
            config_path='./iotorch.toml'
 
-        clusterparams = {'ip':self.options['--ip'],'k8sconfigfile':self.options['--k8sconfigfile']}
+        clusterparams = {'ip':self.options['--ip'],'k8scontext':k8s_context}
 
         cluster = {clustername:clusterparams}
 

@@ -1,7 +1,8 @@
 .cache
 .coverage
-.pyc
+*.pyc
 *.egg-info
 build
 dist
 *cache*
+venv

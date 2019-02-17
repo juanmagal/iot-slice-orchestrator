@@ -13,8 +13,6 @@ from .base import Base
 
 from docopt import docopt
 
-from kubernetes import client, config
-
 from ..utils import k8sutils
 
 import toml
@@ -72,12 +70,12 @@ class Iotslice(Base):
            print('Cloud cluster does not exist')
            return
 
-        if not k8sutils.createnamespace(iotslicename,edgeclustername):
+        if not k8sutils.createnamespace(iotslicename,edgeclustername,config_path):
            print('Iot Slice not created in Edge Cluster')
            return
 
         if edgeclustername != cloudclustername:
-           if not k8sutils.createnamespace(iotslicename,cloudclustername):
+           if not k8sutils.createnamespace(iotslicename,cloudclustername,config_path):
              print('Iot Slice not created in Cloud Cluster')
              return
 
@@ -118,14 +116,14 @@ class Iotslice(Base):
         iotslice = iotslices.pop(iotslicename)
 
         edgeclustername = iotslice.get('edge')
-        cloudclustername = iotslice.get('edge')
+        cloudclustername = iotslice.get('cloud')
 
-        if not k8sutils.deletenamespace(iotslicename,edgeclustername):
+        if not k8sutils.deletenamespace(iotslicename,edgeclustername,config_path):
            print('Iot Slice not deleted in Edge Cluster')
            return
 
         if edgeclustername != cloudclustername:
-           if not k8sutils.deletenamespace(iotslicename,cloudclustername):
+           if not k8sutils.deletenamespace(iotslicename,cloudclustername,config_path):
              print('Iot Slice not created in Cloud Cluster')
              return
 

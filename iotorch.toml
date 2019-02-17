@@ -1,0 +1,46 @@
+title = "Example of IoT Orchestrator Configuration"
+
+[owner]
+name = "Juan Manuel Fernandez"
+
+[iotdevices.test2]
+gateway = "test"
+
+[iotgateways.test1]
+cluster = "test"
+slice = "test"
+
+[k8sclusters.kubernetes-rpi]
+k8scontext = "kubernetes-rpi"
+
+[iotslices.test1]
+edge = "test"
+cloud = "test"
+
+[iotslices.test]
+edge = "test"
+cloud = "test"
+
+[k8sclusters.test]
+ip = "127.0.0.1"
+
+[k8sclusters.test1]
+ip = "127.0.0.1"
+
+[iotgateways.test]
+cluster = "test"
+slice = "test"
+
+[iotservers.test]
+cluster = "test"
+slice = "test"
+
+[k8sclusters.kubernetes]
+k8scontext = "kubernetes-admin@kubernetes"
+
+[iotservers.test1]
+cluster = "test"
+slice = "test"
+
+[iotdevices.test]
+gateway = "test"

@@ -1,7 +1,10 @@
 """
 iotorch iotserver
 
-  Usage: iotorch iotserver [create | delete | get | list] [--name=<name>] [--cluster=<cluster>] [--slice=<slice>] [--configfile=<name>] 
+  Usage: 
+    iotorch iotserver create --name=<name> --cluster=<cluster> --slice=<slice> [--helmpath=<path>] [--configfile=<name>] 
+    iotorch iotserver [delete | get] --name=<name> [--configfile=<name>]
+    iotorch iotserver list [--configfile=<name>]
 
 """
 from json import dumps
@@ -13,6 +16,8 @@ from docopt import docopt
 import toml
 
 import os
+
+from ..utils import k8sutils
 
 class Iotserver(Base):
     """The IoT Server command."""
@@ -26,7 +31,13 @@ class Iotserver(Base):
   
         servername = self.options['--name']
 
-        serverparams = {'cluster':self.options['--cluster'],'slice':self.options['--slice']}
+        slicename = self.options['--slice']
+
+        clustername = self.options['--cluster']
+
+        helm_path = self.options['--helmpath']
+
+        serverparams = {'cluster':clustername,'slice':slicename, 'helmpath':helm_path}
 
         server = {servername:serverparams}
 
@@ -51,7 +62,7 @@ class Iotserver(Base):
            print('Cluster does not exist')
            return
 
-        cluster = clusters.get(self.options['--cluster'])
+        cluster = clusters.get(clustername)
 
         if cluster == None:
            print('Cluster does not exist')
@@ -63,10 +74,14 @@ class Iotserver(Base):
            print('Slice does not exist')
            return
 
-        iotslice = iotslices.get(self.options['--slice'])
+        iotslice = iotslices.get(slicename)
 
         if iotslice == None:
            print('Slice does not exist')
+           return
+
+        if not k8sutils.createiotserverincluster(slicename,clustername,helm_path,config_path):
+           print('IoT Server not deployed in cluster %s' %cluster)
            return
 
         config.update({'iotservers':servers})
@@ -104,6 +119,13 @@ class Iotserver(Base):
            return
 
         server = servers.pop(servername)
+
+        slicename = server.get('slice')
+        clustername = server.get('cluster')
+
+        if not k8sutils.deleteiotserverincluster(slicename,clustername,config_path):
+           print('IoT Server not removed from cluster %s' %cluster)
+           return
 
         config.update({'iotservers':servers})
 

@@ -67,7 +67,7 @@ def deletenamespace(iotslice,cluster,configfile):
 
     return True
 
-def createiotgatewayincluster(iotslice,cluster,helmpath,configfile):
+def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 
     clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
 
@@ -77,11 +77,9 @@ def createiotgatewayincluster(iotslice,cluster,helmpath,configfile):
        print ("IP Address for cluster %s not found" %cluster)
        return False
 
-    chartname = "iotgateway"
+    releasename = name+"-"+iotslice
 
-    releasename = "iotgateway-"+iotslice
-
-    chart = ChartBuilder({'name': chartname, 'source': {'type': 'directory', 'location': helmpath}})
+    chart = ChartBuilder({'name': name, 'source': {'type': 'directory', 'location': helmpath}})
 
     t = Tiller(host=clusterip,port=clusterhelmport)
 
@@ -89,7 +87,7 @@ def createiotgatewayincluster(iotslice,cluster,helmpath,configfile):
 
     return True
 
-def deleteiotgatewayincluster(iotslice,cluster,configfile):
+def deletehelmincluster(iotslice,cluster,configfile,name):
 
     clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
 
@@ -97,9 +95,26 @@ def deleteiotgatewayincluster(iotslice,cluster,configfile):
 
     t = Tiller(host=clusterip,port=clusterhelmport)
 
-    releasename = "iotgateway-"+iotslice
+    releasename = name+"-"+iotslice
 
     t.uninstall_release(release=releasename)
 
     return True
+
+
+def createiotgatewayincluster(iotslice,cluster,helmpath,configfile):
+
+    return createhelmincluster(iotslice,cluster,helmpath,configfile,"iotgateway")
+
+def deleteiotgatewayincluster(iotslice,cluster,configfile):
+
+    return deletehelmincluster(iotslice,cluster,configfile,"iotgateway")
+
+def createiotserverincluster(iotslice,cluster,helmpath,configfile):
+
+    return createhelmincluster(iotslice,cluster,helmpath,configfile,"iotserver")
+
+def deleteiotserverincluster(iotslice,cluster,configfile):
+
+    return deletehelmincluster(iotslice,cluster,configfile,"iotserver")
 

@@ -39,7 +39,7 @@ class Iotgateway(Base):
 
         slicename = self.options['--slice']
 
-        gatewayparams = {'cluster':clustername,'slice':slicename}
+        gatewayparams = {'cluster':clustername,'slice':slicename,'helmpath':helm_path}
 
         gateway = {gatewayname:gatewayparams}
 

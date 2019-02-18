@@ -25,7 +25,7 @@ The following commands can be executed:
 
 For configuration of Kubernetes clusters where IoT Gateways and Servers will be deployed:
 
-    $ iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>]
+    $ iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--k8shelmport=<port>]
     $ iotorch k8scluster delete --name=<name>
     $ iotorch k8scluster get --name=<name>
     $ iotorch k8scluster list
@@ -39,14 +39,14 @@ For definition of IoT Slices:
 
 In order to manager IoT Servers:
 
-    $ iotorch iotserver create --name=<name> --cluster=<k8scluster> [--slice=<iotslice>]
+    $ iotorch iotserver create --name=<name> --cluster=<k8scluster> [--slice=<iotslice>] [--helmpath=<path>]
     $ iotorch iotserver delete --name=<name>
     $ iotorch iotserver get --name=<name>
     $ iotorch iotserver list
 
 In order to manage IoT Gateways :
 
-    $ iotorch iotgateway create --name=<name> --cluster=<k8cluster> [--slice=<iotslice>]
+    $ iotorch iotgateway create --name=<name> --cluster=<k8cluster> [--slice=<iotslice>] [--helmpath=<path>]
     $ iotorch iotgateway attach --name=<name> --server=<iotserver>
     $ iotorch iotgateway delete --name=<name>
     $ iotorch iotgateway get --name=<name>

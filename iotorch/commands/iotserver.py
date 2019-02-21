@@ -3,6 +3,7 @@ iotorch iotserver
 
   Usage: 
     iotorch iotserver create --name=<name> --cluster=<cluster> --slice=<slice> [--helmpath=<path>] [--configfile=<name>] 
+    iotorch iotserver set --name=<name> --user=<username> --password=<password> [--configfile=<name>]
     iotorch iotserver [delete | get] --name=<name> [--configfile=<name>]
     iotorch iotserver list [--configfile=<name>]
 
@@ -17,7 +18,7 @@ import toml
 
 import os
 
-from ..utils import k8sutils
+from ..utils import k8sutils,serverutils
 
 class Iotserver(Base):
     """The IoT Server command."""
@@ -89,6 +90,66 @@ class Iotserver(Base):
            toml.dump(config,f)
 
         print('IoT Server %s created' %servername)
+
+    def set(self):
+
+        config_path = self.options['--configfile']
+
+        if (not config_path):
+           config_path='./iotorch.toml'
+
+        servername = self.options['--name']
+
+        username = self.options['--user']
+
+        password = self.options['--password']
+
+        serverparams = {'username':username,'password':password}
+
+        config = {}
+
+        if not os.path.exists(config_path):
+           print('Nothing to set')
+           return
+
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+           if config.get('iotservers') == None:
+               print('Nothing to set')
+               return
+
+        servers = config.get('iotservers')
+
+        server = servers.get(servername)
+
+        if server == None:
+           print('Nothing to delete')
+           return
+
+        updatedserver = {servername:serverparams}
+
+        servers.update(updatedserver)
+
+        # Create user in mainflux
+
+        clustername = server.get('cluster')
+        slicename = server.get('slice')
+
+        token = serverutils.createServerUser(username, password, clustername, slicename,config_path)
+
+        if not token:
+           print('User was not created in IoT Server %s' %servername)
+           return
+
+        servers.update({servername:{'token':token}})
+
+        config.update({'iotservers':servers})
+
+        with open(config_path,'w+') as f:
+           toml.dump(config,f)
+      
+        print('IoT Server %s set' %servername)
 
     def delete(self):
 
@@ -190,6 +251,9 @@ class Iotserver(Base):
         elif options['list']:
             self.options=options
             self.list()
+        elif options['set']:
+            self.options=options
+            self.set()
         else:
             print("Option not implemented")
             raise NotImplementedError('Option not implemented')

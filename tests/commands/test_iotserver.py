@@ -77,6 +77,19 @@ class TestIotServer(TestCase):
         output = popen(['iotorch', 'iotserver', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
         self.assertTrue(text.encode('utf-8') in output)
 
+    def test_returns_iotserver_set(self):
+        name='test1'
+        username='test@user.com'
+        password='testpassword'
+        operation='set'
+        text= "IoT Server " + name + " set"
+        configfile='./tests/conf/iotorch.toml'
+        output = popen(['iotorch', 'iotserver', operation, '--name='+name, '--user='+username, '--password='+password, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(text.encode('utf-8') in output)
+        operation='get'
+        output = popen(['iotorch', 'iotserver', operation, '--name='+name, '--configfile='+configfile], stdout=PIPE).communicate()[0]
+        self.assertTrue(username.encode('utf-8') in output)
+
     def test_returns_iotserver_delete(self):
         name='server1'
         operation='delete'

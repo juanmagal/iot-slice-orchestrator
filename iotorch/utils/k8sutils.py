@@ -67,6 +67,38 @@ def deletenamespace(iotslice,cluster,configfile):
 
     return True
 
+def getserverip(iotslice,cluster,configfile):
+
+    contextname=iotorchutils.getk8sclustercontext(cluster,configfile)
+
+    if contextname == None:
+       print ("Context for cluster %s not found" %cluster)
+       return None
+
+    config.load_kube_config(context=contextname)
+
+    v1 = client.CoreV1Api()
+
+    try:
+       ret = v1.list_service_for_all_namespaces(watch=False)
+    except ApiException as ae:
+       print ("Error getting list of services, %s" %ae.reason)
+       return None
+    except MaxRetryError as me:
+       print ("Error getting list of services, %s" %me.reason)
+       return None
+
+    # Get external ip address of the nginx service in Mainflux
+    # First address is return assuming there will be only one
+    for i in ret.items:
+        if i.metadata.namespace == iotslice:
+           print(i.metadata.name)
+           if 'nginx' in i.metadata.name:
+              return i.status.load_balancer.ingress[0].ip
+    
+
+
+
 def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 
     clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
@@ -80,6 +112,8 @@ def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
     releasename = name+"-"+iotslice
 
     chart = ChartBuilder({'name': name, 'source': {'type': 'directory', 'location': helmpath}})
+
+    print('chart: '+ chart.dump())
 
     t = Tiller(host=clusterip,port=clusterhelmport)
 

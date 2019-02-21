@@ -37,9 +37,10 @@ For definition of IoT Slices:
     $ iotorch iotslice get --name=<name>
     $ iotorch iotslice list
 
-In order to manager IoT Servers:
+In order to manage IoT Servers:
 
     $ iotorch iotserver create --name=<name> --cluster=<k8scluster> [--slice=<iotslice>] [--helmpath=<path>]
+    $ iotorch iotserver set --name=<name> --user=<e-mail> --password=<password>
     $ iotorch iotserver delete --name=<name>
     $ iotorch iotserver get --name=<name>
     $ iotorch iotserver list
@@ -68,6 +69,7 @@ Examples of iotorch commands:
     iotorch iotslice create --name=testslice --edge=edgecluster --cloud=cloudcluster
     iotorch iotgateway create --name gwtest --cluster=edgecluster --slice=testslice --helmpath=/home/helm/gatewaychart
     iotorch iotserver create --name=servertest --cluster=cloudcluster --slice=testslice --helmpath=/home/helm/serverchart
+    iotorch iotserver set --name servertest --user=test@email.com --password=12345
     
     iotorch iotserver delete --name=servertest
     iotorch iotgateway delete --name gwtest

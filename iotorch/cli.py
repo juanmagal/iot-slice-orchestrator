@@ -42,7 +42,10 @@ def main():
 
     commandargs = options['<args>']
 
-    module = getattr(iotorch.commands, command)
+    try:
+       module = getattr(iotorch.commands, command)
+    except AttributeError as ae:
+       exit(__doc__.split("\n")[3]) 
 
     iotorch.commands = getmembers(module, isclass)
 

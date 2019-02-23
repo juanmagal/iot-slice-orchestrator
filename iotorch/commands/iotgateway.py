@@ -86,6 +86,12 @@ class Iotgateway(Base):
            print('IoT Gateway not deployed in cluster %s' %cluster)
            return
 
+        gatewayip =  k8sutils.getgatewayip(slicename,clustername,config_path)
+
+        if gatewayip == None:
+           print('IoT Gateway not sucessfully deployed in cluster %s' %cluster)
+           return
+
         config.update({'iotgateways':gateways})
         with open(config_path,'w+') as f:
            toml.dump(config,f)
@@ -215,7 +221,7 @@ class Iotgateway(Base):
         gatewayexporterip =  k8sutils.getexportergatewayip(slicename,clustername,config_path)
 
         if gatewayexporterip == None:
-           print('IoT server could not be updated')
+           print('IoT Gateway could not be updated')
            return
 
         gateway['server'] = servername
@@ -226,7 +232,7 @@ class Iotgateway(Base):
 
         # TODO keep exported id
         if not gatewayutils.createExporter(gatewayexporterip,gatewayname,servername,server.get('serverip'),gateway.get('servertopic'),gateway.get('servertopicuser'),gateway.get('servertopicpassword')):
-           print('IoT server could not be updated')
+           print('IoT Gateway could not be updated')
            return
 
         gateway = {gatewayname:gateway}

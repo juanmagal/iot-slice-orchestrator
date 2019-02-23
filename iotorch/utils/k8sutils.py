@@ -114,6 +114,9 @@ def getexportergatewayip(iotslice,cluster,configfile):
 
     return getserviceipaddress(iotslice,cluster,configfile,'export-client')
 
+def getgatewayip(iotslice,cluster,configfile):
+
+    return getserviceipaddress(iotslice,cluster,configfile,'metadata')
 
 def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 

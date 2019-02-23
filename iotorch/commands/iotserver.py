@@ -127,22 +127,28 @@ class Iotserver(Base):
            print('Nothing to delete')
            return
 
-        updatedserver = {servername:serverparams}
+        server.update(serverparams)
 
-        servers.update(updatedserver)
+        servers.update(server)
 
         # Create user in mainflux
 
         clustername = server.get('cluster')
         slicename = server.get('slice')
 
-        token = serverutils.createServerUser(username, password, clustername, slicename,config_path)
+        serverip = k8sutils.getserverip(slicename,clustername,config_path)
+
+        if not serverip:
+           print('IoT Server %s not found' %servername)
+           return
+
+        token = serverutils.createServerUser(username, password, clustername, serverip)
 
         if not token:
            print('User was not created in IoT Server %s' %servername)
            return
 
-        servers.update({servername:{'token':token}})
+        servers.update({servername:{'token':token,'serverip':serverip}})
 
         config.update({'iotservers':servers})
 

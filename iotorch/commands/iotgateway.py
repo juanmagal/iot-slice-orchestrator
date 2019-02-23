@@ -19,7 +19,7 @@ import toml
 
 import os
 
-from ..utils import k8sutils
+from ..utils import k8sutils,serverutils,gatewayutils
 
 class Iotgateway(Base):
     """The IoT Gateway command."""
@@ -126,6 +126,23 @@ class Iotgateway(Base):
 
         slicename = gateway.get('slice')
         clustername = gateway.get('cluster')
+        servername = gateway.get('server')
+
+        # Check if gateway was attached
+        if servername != None:
+           servers = config.get('iotservers')
+           if servers != None:
+              server = servers.get(servername)
+              if server != None:
+                 if serverutils.deleteDevice(server.get('token'),server.get('serverip'),gateway.get('servertopicuser')):
+                    print('IoT Gateway not dettached from IoT Server %s' %servername)
+                    return
+                 else:
+                    gatewayexporterip =  k8sutils.getexportergatewayip(slicename,clustername,config_path)
+                    # TODO change gatewayname by expid
+                    if not gatewayutils.deleteExporter(gatewayexporterip,gatewayname):
+                       print('IoT Gateway not dettached from IoT Server %s' %servername)
+                       return
 
         if not k8sutils.deleteiotgatewayincluster(slicename,clustername,config_path):
            print('IoT Gateway not removed from cluster %s' %cluster)
@@ -186,10 +203,33 @@ class Iotgateway(Base):
            print('IoT Server does not exist')
            return
 
+        response = serverutils.createDevice(server.get('token'),server.get('serverip'),'iotgateway-'+gatewayname)
+
+        if response == None:
+           print('Impossible to attach to IoT Server')
+           return
+
+        slicename = gateway.get('slice')
+        clustername = gateway.get('cluster')
+
+        gatewayexporterip =  k8sutils.getexportergatewayip(slicename,clustername,config_path)
+
+        if gatewayexporterip == None:
+           print('IoT server could not be updated')
+           return
+
         gateway['server'] = servername
-  
+        gateway['servertopicuser'] = response['device']
+        gateway['servertopicpassword'] = response['key']
+        gateway['servertopic'] = 'channels/'+response['channel']+'/messages'
+        gateway['exporterip'] = gatewayexporterip
+
+        # TODO keep exported id
+        if not gatewayutils.createExporter(gatewayexporterip,gatewayname,servername,server.get('serverip'),gateway.get('servertopic'),gateway.get('servertopicuser'),gateway.get('servertopicpassword')):
+           print('IoT server could not be updated')
+           return
+
         gateway = {gatewayname:gateway}
- 
         gateways.update(gateway)
 
         config.update({'iotgateways':gateways})

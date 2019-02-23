@@ -67,7 +67,8 @@ def deletenamespace(iotslice,cluster,configfile):
 
     return True
 
-def getserverip(iotslice,cluster,configfile):
+
+def getservices(iotslice,cluster,configfile):
 
     contextname=iotorchutils.getk8sclustercontext(cluster,configfile)
 
@@ -88,15 +89,30 @@ def getserverip(iotslice,cluster,configfile):
        print ("Error getting list of services, %s" %me.reason)
        return None
 
+    return ret.items
+
+def getserviceipaddress(iotslice,cluster,configfile,servicename):
+
+    services = getservices(iotslice,cluster,configfile)
+
+    if services == None:
+       return services
+
     # Get external ip address of the nginx service in Mainflux
     # First address is return assuming there will be only one
-    for i in ret.items:
+    for i in services:
         if i.metadata.namespace == iotslice:
-           print(i.metadata.name)
-           if 'nginx' in i.metadata.name:
+           if servicename in i.metadata.name:
               return i.status.load_balancer.ingress[0].ip
-    
 
+
+def getserverip(iotslice,cluster,configfile):
+
+    return getserviceipaddress(iotslice,cluster,configfile,'nginx')
+
+def getexportergatewayip(iotslice,cluster,configfile):
+
+    return getserviceipaddress(iotslice,cluster,configfile,'export-client')
 
 
 def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
@@ -112,8 +128,6 @@ def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
     releasename = name+"-"+iotslice
 
     chart = ChartBuilder({'name': name, 'source': {'type': 'directory', 'location': helmpath}})
-
-    print('chart: '+ chart.dump())
 
     t = Tiller(host=clusterip,port=clusterhelmport)
 

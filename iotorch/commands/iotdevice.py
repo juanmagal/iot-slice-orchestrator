@@ -2,7 +2,7 @@
 iotorch iotdevice
 
   Usage:
-    iotorch iotdevice create --name=<name> --gateway=<gateway> [--configfile=<name>]   
+    iotorch iotdevice create --name=<name> --gateway=<gateway> [--protocol=<protocol>] [--resource=<resource>]... [--configfile=<name>]   
     iotorch iotdevice [delete|get] --name=<name> [--configfile=<name>]
     iotorch iotdevice list [--configfile=<name>]
 
@@ -29,8 +29,18 @@ class Iotdevice(Base):
            config_path='./iotorch.toml'
 
         devicename = self.options['--name']
+        gatewayname = self.options['--gateway']
+        resources = self.options['--resource']
 
-        deviceparams = {'gateway':self.options['--gateway']}
+        protocol = self.options['--configfile']
+ 
+        # By default we will use SenML format when using MQTT
+        # That could be changed in the future
+        protocolformat = None
+        if protocol == 'MQTT':
+           protocolformat = 'SENML'
+
+        deviceparams = {'gateway':gatewayname,'protocol':protocol,'format':protocolformat,'resources':resources}
 
         device = {devicename:deviceparams}
 
@@ -38,13 +48,35 @@ class Iotdevice(Base):
 
         devices = device
 
-        if os.path.exists(config_path):
-           with open(config_path,'r') as f:
-              config = toml.load(f)
+        if not os.path.exists(config_path):
+           print('IoT Gateway does not exist')
+           return
+
+        with open(config_path,'r') as f:
+           config = toml.load(f)
+           f.close
+           if config.get('iotdevices') != None:
               devices = config['iotdevices']
               devices.update(device)
-              f.close
-       
+
+        gateways = config.get('iotgateways')
+
+        if gateways == None:
+           print('IoT Gateway does not exist')
+           return
+
+        gateway = gateways.get(gatewayname)
+
+        if gateway == None:
+           print('IoT Gateway does not exist')
+           return
+
+        response = gatewayutils.createDevice(gateway.get('gatewayip'),'iotdevice'+devicename,protocol,protocolformat,resources)
+
+        if response == None:
+           print('Impossible to attach to IoT Gateway')
+           return
+
         config.update({'iotdevices':devices})
         with open(config_path,'w+') as f:
            toml.dump(config,f)

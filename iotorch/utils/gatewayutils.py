@@ -35,8 +35,8 @@ def deleteExporter(gatewayip,gatewayname):
 
   response = requests.delete(url)
 
-  if response.status_code != 201:
-     if response.status_code != 200:
+  if response.status_code != 200:
+     if response.status_code != 404:
         return False
 
   return True
@@ -76,6 +76,19 @@ def createDeviceProfile(gatewayip,devicename,resources):
 
   return True
 
+def deleteDeviceProfile(gatewayip,devicename):
+
+  url = 'http://'+gatewayip+':48081/api/v1/deviceprofile/name/'+devicename
+
+  response = requests.delete(url)
+
+  if response.status_code != 404:
+     if response.status_code != 200:
+        return False
+
+  return True
+
+
 def createMqttAddressable(gatewayip,devicename):
 
   url = 'http://'+gatewayip+':48081/api/v1/addressable'
@@ -85,6 +98,18 @@ def createMqttAddressable(gatewayip,devicename):
   response = requests.post(url, json=addressabledata)
 
   if response.status_code != 201:
+     if response.status_code != 200:
+        return False
+
+  return True
+
+def deleteAddressable(gatewayip,devicename):
+
+  url = 'http://'+gatewayip+':48081/api/v1/addressable/name/'+devicename
+
+  response = requests.delete(url)
+
+  if response.status_code != 404:
      if response.status_code != 200:
         return False
 
@@ -124,3 +149,22 @@ def createDevice(gatewayip,devicename,protocol,protocolformat,resources):
         return False
 
   return True
+
+def deleteDevice(gatewayip,devicename):
+
+  if not deleteAddressable(gatewayip,devicename):
+     return False
+
+  if not deleteDeviceProfile(gatewayip,devicename):
+     return False
+
+  url = 'http://'+gatewayip+':48081/api/v1/device/name/'+devicename
+
+  response = requests.delete(url)
+
+  if response.status_code != 404:
+     if response.status_code != 200:
+        return False
+
+  return True
+

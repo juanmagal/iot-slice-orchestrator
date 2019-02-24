@@ -113,6 +113,17 @@ class Iotdevice(Base):
 
         device = devices.pop(devicename)
 
+        gatewayname = device.get('gateway')
+
+        gateways = config.get('iotgateways')
+
+        if gateways != None:
+           gateway = gateways.get(gatewayname)
+           if gateway != None:
+              if not gatewayutils.deleteDevice(gateway.get('gatewayip'),'iotdevice'+devicename):
+                  print('Impossible to dettach from IoT Gateway')
+                  return
+
         config.update({'iotdevices':devices})
 
         with open(config_path,'w+') as f:

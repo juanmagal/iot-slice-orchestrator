@@ -142,13 +142,11 @@ class Iotserver(Base):
            print('IoT Server %s not found' %servername)
            return
 
-        token = serverutils.createServerUser(username, password, clustername, serverip)
-
-        if not token:
+        if not serverutils.createServerUser(username, password, clustername, serverip):
            print('User was not created in IoT Server %s' %servername)
            return
 
-        servers.update({servername:{'token':token,'serverip':serverip}})
+        servers.update({servername:{'serverip':serverip}})
 
         config.update({'iotservers':servers})
 

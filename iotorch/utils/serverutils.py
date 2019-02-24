@@ -12,9 +12,9 @@ def createServerUser(user, password, cluster, serverip):
   response = requests.post(url, json=payload)
 
   if (response.status_code == 201) or (response.status_code == 200):
-     return getToken(payload,serverip)
+     return True
   else:
-     return None
+     return False
 
 def getToken(payload,serverip):
 
@@ -22,13 +22,25 @@ def getToken(payload,serverip):
 
   response = requests.post(url, json=payload)
  
-  if response.status_code == 200:
-     return None
-  else:
+  print(str(response.status_code))
+
+  if (response.status_code == 200) or (response.status_code == 201):
      data = response.json()
      return data['token']
+  else:
+     return None
 
-def createDevice(token, serverip,name):
+def createDevice(serverip,name,user,password):
+
+  print(user)
+  print(password)
+
+  payload = {'email': user , 'password': password }
+
+  token = getToken(payload,serverip)
+
+  if token == None:
+     return None
 
   authheader = {'Authorization': token}
 
@@ -99,7 +111,14 @@ def getDevice(token,serverip,devid):
      data = response.json()
      return data
 
-def deleteDevice(token,serverip,devid):
+def deleteDevice(serverip,devid,user,password):
+
+  payload = {'email': user , 'password': password }
+
+  token = getToken(payload,serverip)
+
+  if token == None:
+     return False
 
   authheader = {'Authorization': token}
 
@@ -109,8 +128,8 @@ def deleteDevice(token,serverip,devid):
 
   responsedev = requests.delete(urlthings, headers=authheader)
 
-  if response.status_code != 201:
-     if response.status_code != 200:
+  if responsedev.status_code != 201:
+     if responsedev.status_code != 200:
         return False
 
   return True

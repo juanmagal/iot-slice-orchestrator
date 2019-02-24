@@ -140,12 +140,11 @@ class Iotgateway(Base):
            if servers != None:
               server = servers.get(servername)
               if server != None:
-                 if serverutils.deleteDevice(server.get('token'),server.get('serverip'),gateway.get('servertopicuser')):
+                 if not serverutils.deleteDevice(server.get('serverip'),gateway.get('servertopicuser'),server.get('username'),server.get('password')):
                     print('IoT Gateway not dettached from IoT Server %s' %servername)
                     return
                  else:
                     gatewayexporterip =  k8sutils.getexportergatewayip(slicename,clustername,config_path)
-                    # TODO change gatewayname by expid
                     if not gatewayutils.deleteExporter(gatewayexporterip,gatewayname):
                        print('IoT Gateway not dettached from IoT Server %s' %servername)
                        return
@@ -209,7 +208,7 @@ class Iotgateway(Base):
            print('IoT Server does not exist')
            return
 
-        response = serverutils.createDevice(server.get('token'),server.get('serverip'),'iotgateway-'+gatewayname)
+        response = serverutils.createDevice(server.get('serverip'),'iotgateway-'+gatewayname,server.get('username'),server.get('password'))
 
         if response == None:
            print('Impossible to attach to IoT Server')
@@ -230,7 +229,6 @@ class Iotgateway(Base):
         gateway['servertopic'] = 'channels/'+response['channel']+'/messages'
         gateway['exporterip'] = gatewayexporterip
 
-        # TODO keep exported id
         if not gatewayutils.createExporter(gatewayexporterip,gatewayname,servername,server.get('serverip'),gateway.get('servertopic'),gateway.get('servertopicuser'),gateway.get('servertopicpassword')):
            print('IoT Gateway could not be updated')
            return

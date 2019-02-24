@@ -12,9 +12,10 @@ def createExporter(gatewayip,gatewayname,servername,serverip,servertopic,topicus
 
   url = 'http://'+gatewayip+':48071/api/v1/registration'
 
+  addressabledata = {"name":servername+"mqttbroker","protocol":SERVER_PROTOCOL,"address":serverip,"port":SERVER_MQTT_PORT,"publisher":gatewayname,"user":topicuser,"password":topicpassword,"topic":servertopic}
+
   registrationdata = {"name":gatewayname,"addressable":addressabledata,"format":SERVER_MQTT_FORMAT,"enable":True,"destination":"MQTT_TOPIC"}
   
-
   # Provision Exporter
 
   response = requests.post(url, json=registrationdata)
@@ -26,9 +27,9 @@ def createExporter(gatewayip,gatewayname,servername,serverip,servertopic,topicus
   return True
 
 
-def deleteExporter(gatewayip,expid):
+def deleteExporter(gatewayip,gatewayname):
 
-  url = 'http://'+gatewayip+':48071/api/v1/registration/'+expid
+  url = 'http://'+gatewayip+':48071/api/v1/registration/name/'+gatewayname
 
   # Provision Exporter
 
@@ -45,26 +46,24 @@ def createDeviceProfile(gatewayip,devicename,resources):
   url = 'http://'+gatewayip+':48081/api/v1/deviceprofile'
   devpath = "/api/v1/device/{deviceId}/"
 
-  devProfileData = dict()
-  devProfileData['name'] = devicename
+  devProfileData = {'name': devicename, 'deviceResources': [], 'resources': [], 'commands': []}
 
   # By default we will use Float64 as a type, size 5
   value = {"type": "Float64", "size": "5", "readWrite": "R", "defaultValue": "0", "minimum": "0", "maximum": "500"}
   # By default we will use string and no default unit
   units = { "type": "String", "readWrite": "R", "defaultValue": "" }
-  properties = {"value":value,"units":unit} 
+  properties = {"value":value,"units":units} 
 
-  responses = {"code":["200","503"]}
+  responses = [{"code":"200","description": "get resource value"},{"code":"503","description": "service unavailable"}]
    
   resourceIndex = 0
 
   for item in resources:
-      resourceIndex +=1
       attributes = {"name": item}
-      devresdata = {"name": item,"attributes": item, "properties":properties}
-      resdata =  {"index": resourceIndex, "operation": "get", "object": item, "parameter": item, "property": "value" }
+      devresdata = {"name": item,"attributes": attributes, "properties":properties}
+      resdata =  {"name":item,"get":[{"index": "1", "operation": "get", "object": item, "parameter": item, "property": "value" }]}
       getcommandpath = devpath+item
-      getcommanddata = {"get":{"path":getcommandpath,"responses":responses}}
+      getcommanddata = {"name":item,"get":{"path":getcommandpath,"responses":responses}}
       devProfileData['deviceResources'].append(devresdata)
       devProfileData['resources'].append(resdata)
       devProfileData['commands'].append(getcommanddata)
@@ -81,9 +80,7 @@ def createMqttAddressable(gatewayip,devicename):
 
   url = 'http://'+gatewayip+':48081/api/v1/addressable'
 
-  addressabledata = {"name":devicename, "protocol": "TCP", "address": "0.0.0.0", "port": "1883", "publisher":"CommandPublisher", "user":"admin", "password":"public", "topic":"CommandTopic", "baseURL":"TCP://0.0.0.0:1883", "url":"TCP://0.0.0.0:1883"}
-
-
+  addressabledata = {"name":devicename, "protocol": "TCP", "address": "0.0.0.0", "port": 1883, "publisher":"CommandPublisher", "user":"admin", "password":"public", "topic":"CommandTopic", "baseURL":"TCP://0.0.0.0:1883", "url":"TCP://0.0.0.0:1883"}
 
   response = requests.post(url, json=addressabledata)
 
@@ -108,7 +105,8 @@ def createDevice(gatewayip,devicename,protocol,protocolformat,resources):
 
   addressable = {"name": devicename}
 
-  createDeviceProfile(gatewayip,devicename,resources)
+  if not createDeviceProfile(gatewayip,devicename,resources):
+     return False
 
   profile = {"name": devicename}
 

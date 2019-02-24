@@ -18,6 +18,8 @@ import toml
 
 import os
 
+from ..utils import k8sutils,gatewayutils
+
 class Iotdevice(Base):
     """The IoT Device command."""
 
@@ -32,7 +34,7 @@ class Iotdevice(Base):
         gatewayname = self.options['--gateway']
         resources = self.options['--resource']
 
-        protocol = self.options['--configfile']
+        protocol = self.options['--protocol']
  
         # By default we will use SenML format when using MQTT
         # That could be changed in the future
@@ -71,9 +73,7 @@ class Iotdevice(Base):
            print('IoT Gateway does not exist')
            return
 
-        response = gatewayutils.createDevice(gateway.get('gatewayip'),'iotdevice'+devicename,protocol,protocolformat,resources)
-
-        if response == None:
+        if not gatewayutils.createDevice(gateway.get('gatewayip'),'iotdevice'+devicename,protocol,protocolformat,resources):
            print('Impossible to attach to IoT Gateway')
            return
 

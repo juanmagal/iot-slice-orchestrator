@@ -36,8 +36,9 @@ def deleteExporter(gatewayip,gatewayname):
   response = requests.delete(url)
 
   if response.status_code != 200:
-     if response.status_code != 404:
-        return False
+     if response.status_code != 204:
+        if response.status_code != 404:
+         return False
 
   return True
 
@@ -82,9 +83,10 @@ def deleteDeviceProfile(gatewayip,devicename):
 
   response = requests.delete(url)
 
-  if response.status_code != 404:
-     if response.status_code != 200:
-        return False
+  if response.status_code != 200:
+     if response.status_code != 204:
+        if response.status_code != 404:
+         return False
 
   return True
 
@@ -109,9 +111,10 @@ def deleteAddressable(gatewayip,devicename):
 
   response = requests.delete(url)
 
-  if response.status_code != 404:
-     if response.status_code != 200:
-        return False
+  if response.status_code != 200:
+     if response.status_code != 204:
+        if response.status_code != 404:
+         return False
 
   return True
 
@@ -162,9 +165,10 @@ def deleteDevice(gatewayip,devicename):
 
   response = requests.delete(url)
 
-  if response.status_code != 404:
-     if response.status_code != 200:
-        return False
+  if response.status_code != 200:
+     if response.status_code != 204:
+        if response.status_code != 404:
+         return False
 
   return True
 

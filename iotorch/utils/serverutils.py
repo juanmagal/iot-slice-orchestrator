@@ -22,8 +22,6 @@ def getToken(payload,serverip):
 
   response = requests.post(url, json=payload)
  
-  print(str(response.status_code))
-
   if (response.status_code == 200) or (response.status_code == 201):
      data = response.json()
      return data['token']
@@ -31,9 +29,6 @@ def getToken(payload,serverip):
      return None
 
 def createDevice(serverip,name,user,password):
-
-  print(user)
-  print(password)
 
   payload = {'email': user , 'password': password }
 
@@ -128,9 +123,10 @@ def deleteDevice(serverip,devid,user,password):
 
   responsedev = requests.delete(urlthings, headers=authheader)
 
-  if responsedev.status_code != 201:
-     if responsedev.status_code != 200:
-        return False
+  if responsedev.status_code != 404:
+     if responsedev.status_code != 204:
+        if responsedev.status_code != 200:
+           return False
 
   return True
  

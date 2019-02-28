@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.redis.name }}
+  labels:
+    component: {{ .Values.redis.name }}
+spec:
+  selector:
+    component: {{ .Values.redis.name }}
+  ports:
+  - port: {{ .Values.redis.port }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.redis.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.redis.name }}
+spec:
+  replicas: {{ .Values.global.replicas }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.redis.name }}
+    spec:
+      containers:
+      - name: {{ .Values.redis.name }}
+        image: {{ .Values.redisImage }}
+        ports:
+        - containerPort: {{ .Values.redis.port }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        resources:
+          requests:
+            cpu: {{ .Values.resource.cpu }}
+            memory: {{ .Values.resource.memory }}
+

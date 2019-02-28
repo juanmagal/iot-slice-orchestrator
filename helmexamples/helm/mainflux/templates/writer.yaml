@@ -1,0 +1,39 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.writer.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.writer.name }}
+spec:
+  replicas: {{ .Values.global.replicas }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.writer.name }}
+    spec:
+      containers:
+      - name: {{ .Values.writer.name }}
+        image: {{ .Values.influxdbWriterImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.writer.port }}
+        env:
+        {{- range $key, $value := .Values.writer.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.writer.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.writer.name }}
+spec:
+  selector:
+    component: {{ .Values.writer.name }}
+  ports:
+  - port: {{ .Values.writer.port }}
+  type: {{ .Values.global.serviceType }}

@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.ws.adapterName }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.ws.adapterName }}
+spec:
+  ports:
+  - port: {{ .Values.ws.adapterPort }}
+  selector:
+    component: {{ .Values.ws.adapterName }}
+  type: {{ .Values.global.serviceType}}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.ws.adapterName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.ws.adapterName }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.ws.adapterName }}
+  labels:
+    component: {{ .Values.ws.adapterName }}
+spec:
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.ws.adapterName }}
+    spec:
+      containers:
+      - name: {{ .Values.ws.adapterName }}
+        image: {{ .Values.wsAdapterImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.ws.adapterPort }}
+        env:
+        {{- range $key, $value := .Values.ws.adapterEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+        {{- end }}

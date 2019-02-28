@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - name: "27017"
+    port: {{ .Values.mongo.port }}
+  selector:
+    io.kompose.service: {{ .Values.mongo.name }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.mongo.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.mongo.name }}
+    spec:
+      containers:
+      - image: {{ .Values.mongoImage }}
+        name: {{ .Values.mongo.name }}
+        ports:
+        - containerPort: {{ .Values.mongo.port }}
+        resources: {}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.data_db.path }}
+          name: {{ .Values.volumes.data_db.name }}
+        - mountPath: {{ .Values.volumes.logs.path }}
+          name: {{ .Values.volumes.logs.name }}
+        - mountPath: {{ .Values.volumes.consul_config.path }}
+          name: {{ .Values.volumes.consul_config.name }}
+        - mountPath: {{ .Values.volumes.consul_data.path }}
+          name: {{ .Values.volumes.consul_data.name }}
+      restartPolicy: Always
+      volumes:
+        - name: {{ .Values.volumes.data_db.name }}
+          hostPath:
+            path: {{ .Values.volumes.data_db.path }}
+        - name: {{ .Values.volumes.logs.name }}
+          hostPath:
+            path: {{ .Values.volumes.logs.path }}
+        - name: {{ .Values.volumes.consul_config.name }}
+          hostPath:
+            path: {{ .Values.volumes.consul_config.path }}
+        - name: {{ .Values.volumes.consul_data.name }}
+          hostPath:
+            path: {{ .Values.volumes.consul_data.path }}

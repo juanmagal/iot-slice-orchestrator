@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.users.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.users.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.users.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.users.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.usersDb.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.usersDb.name }}
+spec:
+  ports:
+    - port: {{ .Values.usersDb.port }}
+  selector:
+    component: {{ .Values.usersDb.name }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.usersDb.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.usersDb.name }}
+spec:
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.usersDb.name }}
+    spec:
+      containers:
+      - name: {{ .Values.usersDb.name }}
+        image: {{ .Values.usersPostgresImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        env:
+        {{- range $key, $value := .Values.usersDb.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.usersDb.port }}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.users.mountPath }}
+          name: {{ .Values.volumes.users.name }}
+      volumes:
+      - name: {{ .Values.volumes.users.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.users.claimName }}

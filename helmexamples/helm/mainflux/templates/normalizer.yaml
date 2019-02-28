@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.normalizer.name }}
+  labels:
+    component: {{ .Values.normalizer.name }}
+spec:
+  selector:
+    component: {{ .Values.normalizer.name }}
+  ports:
+  - port: {{ .Values.normalizer.port }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.normalizer.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.normalizer.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.normalizer.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.normalizer.name }}
+spec:
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.normalizer.name }}
+    spec:
+      containers:
+      - name: {{ .Values.normalizer.name }}
+        image: {{ .Values.normalizerImage }}
+        ports:
+        - containerPort: {{ .Values.normalizer.port }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        env:
+        {{- range $key, $value := .Values.normalizer.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /version
+            port: {{ .Values.normalizer.port }}
+          initialDelaySeconds: {{ .Values.global.probe.initialDelay }}
+          periodSeconds: {{ .Values.global.probe.period }}

@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.consul.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    io.kompose.service: {{ .Values.consul.name }}
+  annotations:
+spec:
+  ports:
+    - port: {{ .Values.consul.ports.server }}
+      name: server
+    - port: {{ .Values.consul.ports.cli_rpc }}
+      name: cli-rpc
+    - port: {{ .Values.consul.ports.http }}
+      name: http
+    - port: {{ .Values.consul.ports.https }}
+      name: https
+    - port: {{ .Values.consul.ports.dns }}
+      name: dns
+  selector:
+    io.kompose.service: {{ .Values.consul.name }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.consul.name }}
+  name: {{ .Values.consul.name }}
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.consul.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.consul.name }}
+  name: {{ .Values.consul.name }}
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.consul.name }}
+    spec:
+      containers:
+      - image: {{ .Values.coreConsulImage }}
+        name: {{ .Values.consul.name }}
+        ports:
+        - containerPort: {{ .Values.consul.ports.server }}
+        - containerPort: {{ .Values.consul.ports.cli_rpc }}
+        - containerPort: {{ .Values.consul.ports.http }}
+        - containerPort: {{ .Values.consul.ports.https }}
+        - containerPort: {{ .Values.consul.ports.dns }}
+        resources: {}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.data_db.path }}
+          name: {{ .Values.volumes.data_db.name }}
+        - mountPath: {{ .Values.volumes.logs.path }}
+          name: {{ .Values.volumes.logs.name }}
+        - mountPath: {{ .Values.volumes.consul_config.path }}
+          name: {{ .Values.volumes.consul_config.name }}
+        - mountPath: {{ .Values.volumes.consul_data.path }}
+          name: {{ .Values.volumes.consul_data.name }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.volumes.data_db.name }}
+        hostPath:
+          path: {{ .Values.volumes.data_db.path }}
+      - name: {{ .Values.volumes.logs.name }}
+        hostPath:
+          path: {{ .Values.volumes.logs.path }}
+      - name: {{ .Values.volumes.consul_config.name }}
+        hostPath:
+          path: {{ .Values.volumes.consul_config.path }}
+      - name: {{ .Values.volumes.consul_data.name }}
+        hostPath:
+          path: {{ .Values.volumes.consul_data.path }}

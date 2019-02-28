@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.edgex_notifications.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    io.kompose.service: {{ .Values.edgex_notifications.name }}
+spec:
+  type: {{ .Values.global.serviceType }}
+  ports:
+    - port: {{ .Values.edgex_notifications.port }}
+  selector:
+    io.kompose.service: {{ .Values.edgex_notifications.name }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_notifications.name }}
+  name: {{ .Values.edgex_notifications.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.edgex_notifications.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_notifications.name }}
+  name: {{ .Values.edgex_notifications.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.edgex_notifications.name }}
+    spec:
+      containers:
+      - image: {{ .Values.notificationsImage }}
+        name: {{ .Values.edgex_notifications.name }}
+        ports:
+        - containerPort: {{ .Values.edgex_notifications.port }}
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: {{ .Values.edgex_notifications.port }}
+          initialDelaySeconds: {{ .Values.global.probes.initial_delay }}
+          timeoutSeconds: {{ .Values.global.probes.timeout }}
+          periodSeconds: {{ .Values.global.probes.period }}
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: {{ .Values.edgex_notifications.port }}
+          initialDelaySeconds: {{ .Values.global.probes.delay }}
+          timeoutSeconds: {{ .Values.global.probes.timeout }}
+          periodSeconds: {{ .Values.global.probes.period }}
+        resources: {}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.data_db.path }}
+          name: {{ .Values.volumes.data_db.name }}
+        - mountPath: {{ .Values.volumes.logs.path }}
+          name: {{ .Values.volumes.logs.name }}
+        - mountPath: {{ .Values.volumes.consul_config.path }}
+          name: {{ .Values.volumes.consul_config.name }}
+        - mountPath: {{ .Values.volumes.consul_data.path }}
+          name: {{ .Values.volumes.consul_data.name }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.volumes.data_db.name }}
+        hostPath:
+          path: {{ .Values.volumes.data_db.path }}
+      - name: {{ .Values.volumes.logs.name }}
+        hostPath:
+          path: {{ .Values.volumes.logs.path }}
+      - name: {{ .Values.volumes.consul_config.name }}
+        hostPath:
+          path: {{ .Values.volumes.consul_config.path }}
+      - name: {{ .Values.volumes.consul_data.name }}
+        hostPath:
+          path: {{ .Values.volumes.consul_data.path }}

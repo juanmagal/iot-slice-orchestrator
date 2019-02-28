@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nginx.configMap.name" }}
+  namespace: {{ .Values.global.namespace }}
+data:
+{{ (.Files.Glob "static/nginx.conf").AsConfig | indent 2 }}

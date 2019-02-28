@@ -1,0 +1,242 @@
+# Default values for mainflux.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# images
+redisImage: "k8s.gcr.io/redis:e2e"
+mqttAdapterImage: "mainflux/mqtt:latest"
+httpAdapterImage: "mainflux/http:latest"
+wsAdapterImage: "mainflux/ws:latest"
+influxdbImage: "influxdb:1.5.2-alpine"
+influxdbReaderImage: "mainflux/influxdb-reader:latest"
+influxdbWriterImage: "mainflux/influxdb-writer:latest"
+nginxImage: nginx:1.13-alpine
+usersImage: mainflux/users:latest
+thingsImage: mainflux/things:latest
+usersPostgresImage: postgres:10.2-alpine
+thingsPostgresImage: postgres:10.2-alpine
+normalizerImage: mainflux/normalizer:latest
+dashfluxImage: mainflux/dashflux:latest
+#redisThingsImage: redis:5.0-alpine
+#redisImage: redis:4.0.9-alpine
+
+# volumes
+volumes:
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  things:
+    claimName: "mainflux-things-postgres-data-claim"
+    path: "/tmp/data/things-postgres-0" 
+    name: "mainflux-things-postgres-data"
+    diskName: "mainflux-things-postgres-data-disk"
+    mountPath: "/var/lib/postgresql/data"
+  users:
+    claimName: "mainflux-users-postgres-data-claim"
+    path: "/tmp/data/users-postgres-0"
+    name: "mainflux-users-postgres-data"
+    diskName: "mainflux-users-postgres-data-disk"
+    mountPath: "/var/lib/postgresql/data"
+  influxdb:
+    claimName: "mainflux-influxdb-data-claim"
+    path: "/tmp/data/influxdb-0"
+    name: "mainflux-influxdb-data"
+    diskName: "mainflux-influxdb-data-disk"
+    mountPath: "/var/lib/influxdb"
+  secretVolume: "secret-volume"
+  secretVolumeName: "mainflux-secret"
+  configMapVolume: "configmap-volume"
+  nginxCert:
+    mountPath: "/etc/ssl/certs/mainflux-server.crt"
+    subPath: "mainflux-server.crt"
+  nginxKey:
+    mountPath: "/etc/ssl/private/mainflux-server.key"
+    subPath: "mainflux-server.key"
+  nginxDhParam:
+    mountPath: "/etc/ssl/certs/dhparam.pem"
+    subPath: "dhparam.pem"
+  nginxConf:
+    mountPath: "/etc/nginx/nginx.conf"
+    subPath: "nginx.conf"
+
+dashflux:
+  name: "dashflux"
+  port: 3000
+    
+normalizer:
+  name: "normalizer"
+  port: 8184
+  env:
+      MF_NATS_URL: "nats://nats-cluster.nats-io:4222"
+      MF_NORMALIZER_PORT: "8184"
+      MF_NORMALIZER_LOG_LEVEL: "debug"
+
+usersDb:
+  name: "mainflux-users-postgres"
+  port: "5432"
+  env:
+    POSTGRES_USER: "mainflux"
+    POSTGRES_PASSWORD: "mainflux"
+    POSTGRES_DB: "users"
+    PGDATA: "/var/lib/postgresql/data/mainflux-users-postgres-data"
+
+users:
+  name: "users"
+  ports:
+    httpName: "users-http"
+    httpPort: 8180
+    grpcName: "users-grpc"
+    grpcPort: 8181
+  env:
+    MF_USERS_DB_HOST: "mainflux-users-postgres"
+    MF_USERS_HTTP_PORT: "8180"
+    MF_USERS_GRPC_PORT: "8181"
+    MF_USERS_SECRET: "test-secret"
+    MF_USERS_LOG_LEVEL: "debug"
+    MF_USERS_DB_PORT: "5432"
+    MF_USERS_DB_USER: "mainflux"
+    MF_USERS_DB_PASS: "mainflux"
+    MF_USERS_DB: "users"
+     
+
+thingsDb:
+  name: "mainflux-things-postgres"
+  port: "5432"
+  env:
+    POSTGRES_USER: "mainflux"
+    POSTGRES_PASSWORD: "mainflux"
+    POSTGRES_DB: "things"
+    PGDATA: "/var/lib/postgresql/data/mainflux-things-postgres-data"
+
+# TODO include redis for things
+#things-redis:
+#  name: "mainflux-things-redis"
+
+things:
+  name: "things"
+  ports:
+    httpName: "things-http"
+    httpPort: 8182
+    grpcName: "things-grpc"
+    grpcPort: 8183
+  env:
+    MF_THINGS_DB_HOST: "mainflux-things-postgres"
+    MF_THINGS_DB_PORT: "5432"
+    MF_THINGS_HTTP_PORT: "8182"
+    MF_THINGS_GRPC_PORT: "8183"
+    MF_USERS_URL: "users:8181"
+    MF_THINGS_SECRET: "test-secret"
+    MF_THINGS_LOG_LEVEL: "debug"
+    MF_THINGS_DB_USER: "mainflux"
+    MF_THINGS_DB_PASS: "mainflux"
+    MF_THINGS_CACHE_URL: "redis-master:6379"
+    MF_THINGS_DB: "things"
+
+mqtt:
+  adapterName: "mqtt-adapter"
+  adapterPorts:
+    mqtt: 1883
+    ws: 8880
+  adapterEnv:
+    MF_MQTT_ADAPTER_LOG_LEVEL: "debug"
+    MF_THINGS_URL: "things:8183"
+    MF_NATS_URL: "nats://nats-cluster.nats-io:4222"
+    MF_MQTT_ADAPTER_REDIS_HOST: "mainflux-redis"
+    MF_MQTT_ADAPTER_PORT: "1883"
+    MF_MQTT_ADAPTER_WS_PORT: "8880"
+
+http:
+  adapterName: "http-adapter"
+  adapterPort: 8185
+  adapterEnv:
+    MF_THINGS_URL: "things:8183"
+    MF_NATS_URL: "nats://nats-cluster.nats-io:4222"
+    MF_HTTP_ADAPTER_PORT: "8185"
+    MF_HTTP_ADAPTER_LOG_LEVEL: "debug"
+
+ws:
+  adapterName: "ws-adapter"
+  adapterPort: 8186
+  adapterEnv:
+    MF_THINGS_URL: "things:8183"
+    MF_NATS_URL: "nats://nats-cluster.nats-io:4222"
+    MF_WS_ADAPTER_PORT: "8186"
+    MF_WS_ADAPTER_LOG_LEVEL: "debug"
+
+influxdb:
+  name: "mainflux-influxdb"
+  port: 8086
+  INFLUXDB_DB: "mainflux"
+  INFLUXDB_ADMIN_USER: "mainflux"
+  INFLUXDB_ADMIN_PASSWORD: "mainflux"
+
+reader:
+  name: "influxdb-reader"
+  port: 8905
+  env:
+      MF_THINGS_URL: "things:8183"
+      MF_INFLUX_READER_PORT: "8905"
+      MF_INFLUX_READER_DB_NAME: "mainflux"
+      MF_INFLUX_READER_DB_HOST: "mainflux-influxdb"
+      MF_INFLUX_READER_DB_PORT: "8086"
+      MF_INFLUX_READER_DB_USER: "mainflux"
+      MF_INFLUX_READER_DB_PASS: "mainflux"
+
+writer:
+  name: "influxdb-writer"
+  port: 8900
+  env:
+      MF_NATS_URL: "nats://nats-cluster.nats-io:4222"
+      MF_INFLUX_WRITER_PORT: "8900"
+      MF_INFLUX_WRITER_BATCH_SIZE: "5000"
+      MF_INFLUX_WRITER_BATCH_TIMEOUT: "5"
+      MF_INFLUX_WRITER_DB_NAME: "mainflux"
+      MF_INFLUX_WRITER_DB_HOST: "mainflux-influxdb"
+      MF_INFLUX_WRITER_DB_PORT: "8086"
+      MF_INFLUX_WRITER_DB_USER: "mainflux"
+      MF_INFLUX_WRITER_DB_PASS: "mainflux"
+
+nginx:
+  fullname: "mainflux-nginx"
+  name: "nginx"
+  ports:
+    http: 80
+    https: 443
+    mqtt: 8883
+
+redis:
+  name: "mainflux-redis"
+  enabled: true
+  port: 6379
+
+resource:
+  cpu: "100m"
+  memory: "100Mi"
+
+defaultResources: 
+  requests:
+    cpu: 0
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+global:
+  pullPolicy: Always
+
+  replicas: 1
+
+  namespace: 
+
+  hpa:
+    min: 1
+    max: 10
+    metric: cpu
+    utilization: 80
+
+  probe:
+    initialDelay: 3
+    period: 3
+
+  serviceType: LoadBalancer

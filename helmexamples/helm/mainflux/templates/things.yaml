@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.things.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.things.name }}
+spec:
+  ports:
+  - port: {{ .Values.things.ports.httpPort }}
+    name: {{ .Values.things.ports.httpName }}
+  - port: {{ .Values.things.ports.grpcPort }}
+    name: {{ .Values.things.ports.grpcName }}
+  selector:
+    component: {{ .Values.things.name }}
+  type: {{ .Values.global.serviceType}}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.things.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.things.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.things.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    matchLabels:
+      component: {{ .Values.things.name }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.things.name }}
+    spec:
+      containers:
+      - name: {{ .Values.things.name }}
+        image: {{ .Values.thingsImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.things.ports.httpPort }}
+          name: {{ .Values.things.ports.httpName }}
+        - containerPort: {{ .Values.things.ports.grpcPort }}
+          name: {{ .Values.things.ports.grpcName }}
+        env:
+        {{- range $key, $value := .Values.things.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /version
+            port: {{ .Values.things.ports.httpPort }}
+          initialDelaySeconds: {{ .Values.global.probe.initialDelay }}
+          periodSeconds: {{ .Values.global.probe.period }}
+

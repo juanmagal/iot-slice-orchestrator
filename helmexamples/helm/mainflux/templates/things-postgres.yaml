@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.things.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.things.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.things.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.things.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.thingsDb.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.thingsDb.name }}
+spec:
+  ports:
+    - port: {{ .Values.thingsDb.port }}
+  selector:
+    component: {{ .Values.thingsDb.name }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.thingsDb.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.thingsDb.name }}
+spec:
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.thingsDb.name }}
+    spec:
+      containers:
+      - name: {{ .Values.thingsDb.name }}
+        image: {{ .Values.thingsPostgresImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        env:
+        {{- range $key, $value := .Values.thingsDb.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.thingsDb.port }}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.things.mountPath }}
+          name: {{ .Values.volumes.things.name }}
+      volumes:
+      - name: {{ .Values.volumes.things.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.things.claimName }}

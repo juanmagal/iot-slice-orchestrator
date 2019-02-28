@@ -1,0 +1,39 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.reader.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.reader.name }}
+spec:
+  replicas: {{ .Values.global.replicas }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.reader.name }}
+    spec:
+      containers:
+      - name: {{ .Values.reader.name }}
+        image: {{ .Values.influxdbReaderImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.reader.port }}
+        env:
+        {{- range $key, $value := .Values.reader.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.reader.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.reader.name }}
+spec:
+  selector:
+    component: {{ .Values.reader.name }}
+  ports:
+  - port: {{ .Values.reader.port }}
+  type: {{ .Values.global.serviceType }}

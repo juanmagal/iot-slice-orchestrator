@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.nginx.fullname }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.nginx.name }}
+spec:
+  type: {{ .Values.global.serviceType }}
+  ports:
+  {{- range $key, $value := .Values.nginx.ports }}
+  - port: {{ $value }}
+    name: {{ $key }}
+  {{- end }}
+  selector:
+    app: {{ .Values.nginx.name }}
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: {{ .Values.nginx.fullname }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nginx.name }}
+    spec:
+      volumes:
+      - name: {{ .Values.volumes.secretVolume }}
+        secret:
+          secretName: {{ .Values.volumes.secretVolumeName }}
+      - name: {{ .Values.volumes.configMapVolume }}
+        configMap:
+          name: {{ template "nginx.configMap.name" }}
+      containers:
+      - name: {{ .Values.nginx.fullname }}
+        image: {{ .Values.nginxImage }}
+        ports:
+        {{- range $key, $value := .Values.nginx.ports }}
+        - containerPort: {{ $value }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.defaultResources | indent 10 }}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.nginxCert.mountPath }}
+          name: {{ .Values.volumes.secretVolume }}
+          subPath: {{ .Values.volumes.nginxCert.subPath }}
+        - mountPath: {{ .Values.volumes.nginxKey.mountPath }}
+          name: {{ .Values.volumes.secretVolume }}
+          subPath: {{ .Values.volumes.nginxKey.subPath }}
+        - mountPath: {{ .Values.volumes.nginxDhParam.mountPath }}
+          name: {{ .Values.volumes.secretVolume }}
+          subPath: {{ .Values.volumes.nginxDhParam.subPath }}
+        - mountPath: {{ .Values.volumes.nginxConf.mountPath }}
+          name: {{ .Values.volumes.configMapVolume }}
+          subPath: {{ .Values.volumes.nginxConf.subPath }}

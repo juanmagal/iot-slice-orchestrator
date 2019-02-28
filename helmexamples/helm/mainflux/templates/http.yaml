@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.http.adapterName }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.http.adapterName }}
+spec:
+  ports:
+  - port: {{ .Values.http.adapterPort }}
+  selector:
+    component: {{ .Values.http.adapterName }}
+  type: {{ .Values.global.serviceType}}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.http.adapterName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.http.adapterName }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.http.adapterName }}
+  labels:
+    component: {{ .Values.http.adapterName }}
+spec:
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.http.adapterName }}
+    spec:
+      containers:
+      - name: {{ .Values.http.adapterName }}
+        image: {{ .Values.httpAdapterImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.http.adapterPort }}
+        env:
+        {{- range $key, $value := .Values.http.adapterEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /version
+            port:  {{ .Values.http.adapterPort }}
+          initialDelaySeconds: {{ .Values.global.probe.initialDelay }}
+          periodSeconds: {{ .Values.global.probe.period }}
+

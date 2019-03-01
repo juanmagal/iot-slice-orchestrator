@@ -1,4 +1,32 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.logs.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.logs.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.logs.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.logs.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.logs.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.logs.size }}
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.edgex_logging.name }}
@@ -66,25 +94,11 @@ spec:
           periodSeconds: {{ .Values.global.probes.period }}
         resources: {}
         volumeMounts:
-        - mountPath: {{ .Values.volumes.data_db.path }}
-          name: {{ .Values.volumes.data_db.name }}
-        - mountPath: {{ .Values.volumes.logs.path }}
+        - mountPath: {{ .Values.volumes.logs.mountPath }}
           name: {{ .Values.volumes.logs.name }}
-        - mountPath: {{ .Values.volumes.consul_config.path }}
-          name: {{ .Values.volumes.consul_config.name }}
-        - mountPath: {{ .Values.volumes.consul_data.path }}
-          name: {{ .Values.volumes.consul_data.name }}
       restartPolicy: Always
       volumes:
-      - name: {{ .Values.volumes.data_db.name }}
-        hostPath:
-          path: {{ .Values.volumes.data_db.path }}
       - name: {{ .Values.volumes.logs.name }}
-        hostPath:
-          path: {{ .Values.volumes.logs.path }}
-      - name: {{ .Values.volumes.consul_config.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_config.path }}
-      - name: {{ .Values.volumes.consul_data.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_data.path }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.logs.claimName }}
+

@@ -13,3 +13,61 @@ spec:
   hostPath:
     path: {{ .Values.volumes.influxdb.path }}-{{ .Release.Namespace }}
   persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.influxdb.claimName }}
+  namespace: {{ .Values.global.namespace }}
+
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}  
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.influxdb.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.influxdb.name }}
+spec:
+  ports:
+    - port: {{ .Values.influxdb.port }}
+  selector:
+    component: {{ .Values.influxdb.name }}
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.influxdb.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.influxdb.name }}
+spec:
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.influxdb.name }}
+    spec:
+      containers:
+      - name: {{ .Values.influxdb.name }}
+        image: {{ .Values.influxdbImage }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        env:
+        {{- range $key, $value := .Values.influxdb.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.influxdb.port }}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.influxdb.mountPath }}
+          name: {{ .Values.volumes.influxdb.name }}
+      volumes:
+      - name: {{ .Values.volumes.influxdb.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.influxdb.claimName }}

@@ -23,7 +23,7 @@ dashfluxImage: mainflux/dashflux:latest
 # volumes
 volumes:
   accessMode: ReadWriteOnce
-  size: 1Gi
+  size: 250Mi
   things:
     claimName: "mainflux-things-postgres-data-claim"
     path: "/tmp/data/things-postgres-0" 

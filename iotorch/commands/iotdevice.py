@@ -73,7 +73,9 @@ class Iotdevice(Base):
            print('IoT Gateway does not exist')
            return
 
-        if not gatewayutils.createDevice(gateway.get('gatewayip'),'iotdevice'+devicename,protocol,protocolformat,resources):
+        gatewayip =  k8sutils.getgatewayip(gateway.get('slice'),gateway.get('cluster'),config_path)
+
+        if not gatewayutils.createDevice(gatewayip,devicename,protocol,protocolformat,resources):
            print('Impossible to attach to IoT Gateway')
            return
 
@@ -120,7 +122,8 @@ class Iotdevice(Base):
         if gateways != None:
            gateway = gateways.get(gatewayname)
            if gateway != None:
-              if not gatewayutils.deleteDevice(gateway.get('gatewayip'),'iotdevice'+devicename):
+              gatewayip =  k8sutils.getgatewayip(gateway.get('slice'),gateway.get('cluster'),config_path)
+              if not gatewayutils.deleteDevice(gatewayip,devicename):
                   print('Impossible to dettach from IoT Gateway')
                   return
 

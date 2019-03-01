@@ -1,4 +1,60 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.consulconfig.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.consulconfig.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.consulconfig.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.consulconfig.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.consuldata.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.consuldata.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.consuldata.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.consuldata.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size }}
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.consul.name }}
@@ -67,25 +123,15 @@ spec:
         - containerPort: {{ .Values.consul.ports.dns }}
         resources: {}
         volumeMounts:
-        - mountPath: {{ .Values.volumes.data_db.path }}
-          name: {{ .Values.volumes.data_db.name }}
-        - mountPath: {{ .Values.volumes.logs.path }}
-          name: {{ .Values.volumes.logs.name }}
-        - mountPath: {{ .Values.volumes.consul_config.path }}
-          name: {{ .Values.volumes.consul_config.name }}
-        - mountPath: {{ .Values.volumes.consul_data.path }}
-          name: {{ .Values.volumes.consul_data.name }}
+        - mountPath: {{ .Values.volumes.consulconfig.mountPath }}
+          name: {{ .Values.volumes.consulconfig.name }}
+        - mountPath: {{ .Values.volumes.consuldata.mountPath }}
+          name: {{ .Values.volumes.consuldata.name }}
       restartPolicy: Always
       volumes:
-      - name: {{ .Values.volumes.data_db.name }}
-        hostPath:
-          path: {{ .Values.volumes.data_db.path }}
-      - name: {{ .Values.volumes.logs.name }}
-        hostPath:
-          path: {{ .Values.volumes.logs.path }}
-      - name: {{ .Values.volumes.consul_config.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_config.path }}
-      - name: {{ .Values.volumes.consul_data.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_data.path }}
+      - name: {{ .Values.volumes.consulconfig.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.consulconfig.claimName }}
+      - name: {{ .Values.volumes.consuldata.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.consuldata.claimName }}

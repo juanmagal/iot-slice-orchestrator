@@ -1,3 +1,4 @@
+
 # Default values for edgexfoundry.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -19,19 +20,50 @@ deviceMqttImage: juanman/docker-device-mqtt-go:latest
 mosquittoImage: eclipse-mosquitto
 
 
+
+# volumes
 volumes:
-  data_db:
-    name: "data-db"
-    path: "/data/db"
-  logs:
-    name: "edgex-logs"
-    path: "/edgex/logs"
-  consul_config:
+  accessMode: ReadWriteOnce
+  size: 250Mi
+  mongo:
+    claimName: "mongo-data-claim"
+    path: "/tmp/data/db"
+    name: "mongo-data"
+    diskName: "mongo-data-disk"
+    mountPath: "/data/db"
+  consulconfig:
+    claimName: "consul-config-claim"
+    path: "/tmp/consul/config"
     name: "consul-config"
-    path: "/consul/config"
-  consul_data:
+    diskName: "consul-config-disk"
+    mountPath: "/consul/config"
+  consuldata:
+    claimName: "consul-data-claim"
+    path: "/tmp/consul/data"
     name: "consul-data"
-    path: "/consul/data"
+    diskName: "consul-data-disk"
+    mountPath: "/consul/data"
+  logs:
+    size: 250Mi
+    claimName: "logs-claim"
+    path: "/tmp/edgex/logs"
+    name: "logs"
+    diskName: "logs-disk"
+    mountPath: "/edgex/logs"
+
+#volumes:
+#  data_db:
+#    name: "data-db"
+#    path: "/data/db"
+#  logs:
+#    name: "edgex-logs"
+#    path: "/edgex/logs"
+#  consul_config:
+#    name: "consul-config"
+#    path: "/consul/config"
+#  consul_data:
+#    name: "consul-data"
+#    path: "/consul/data"
 
 edgex_config_seed:
   name: "edgex-config-seed" 
@@ -130,3 +162,4 @@ global:
     timeout: 1
     period: 15
     delay: 15
+

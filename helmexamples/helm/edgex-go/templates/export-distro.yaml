@@ -55,25 +55,10 @@ spec:
         - containerPort: {{ .Values.edgex_export_distro.ports.analytics_queue }}
         resources: {}
         volumeMounts:
-        - mountPath: {{ .Values.volumes.data_db.path }}
-          name: {{ .Values.volumes.data_db.name }}
-        - mountPath: {{ .Values.volumes.logs.path }}
+        - mountPath: {{ .Values.volumes.logs.mountPath }}
           name: {{ .Values.volumes.logs.name }}
-        - mountPath: {{ .Values.volumes.consul_config.path }}
-          name: {{ .Values.volumes.consul_config.name }}
-        - mountPath: {{ .Values.volumes.consul_data.path }}
-          name: {{ .Values.volumes.consul_data.name }}
       restartPolicy: Always
       volumes:
-      - name: {{ .Values.volumes.data_db.name }}
-        hostPath:
-          path: {{ .Values.volumes.data_db.path }}
       - name: {{ .Values.volumes.logs.name }}
-        hostPath:
-          path: {{ .Values.volumes.logs.path }}
-      - name: {{ .Values.volumes.consul_config.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_config.path }}
-      - name: {{ .Values.volumes.consul_data.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_data.path }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.logs.claimName }}

@@ -16,25 +16,16 @@ spec:
         name: {{ .Values.edgex_config_seed.name }}
         resources: {}
         volumeMounts:
-        - mountPath: {{ .Values.volumes.data_db.path }}
-          name: {{ .Values.volumes.data_db.name }}
-        - mountPath: {{ .Values.volumes.logs.path }}
+        - mountPath: {{ .Values.volumes.consulconfig.mountPath }}
+          name: {{ .Values.volumes.consulconfig.name }}
+        - mountPath: {{ .Values.volumes.logs.mountPath }}
           name: {{ .Values.volumes.logs.name }}
-        - mountPath: {{ .Values.volumes.consul_config.path }}
-          name: {{ .Values.volumes.consul_config.name }}
-        - mountPath: {{ .Values.volumes.consul_data.path }}
-          name: {{ .Values.volumes.consul_data.name }}
       restartPolicy: OnFailure
       volumes:
-      - name: {{ .Values.volumes.data_db.name }}
-        hostPath:
-          path: {{ .Values.volumes.data_db.path }}
+      - name: {{ .Values.volumes.consulconfig.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.consulconfig.claimName }}
       - name: {{ .Values.volumes.logs.name }}
-        hostPath:
-          path: {{ .Values.volumes.logs.path }}
-      - name: {{ .Values.volumes.consul_config.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_config.path }}
-      - name: {{ .Values.volumes.consul_data.name }}
-        hostPath:
-          path: {{ .Values.volumes.consul_data.path }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.logs.claimName }}
+

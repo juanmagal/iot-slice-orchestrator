@@ -123,6 +123,9 @@ class Iotdevice(Base):
            gateway = gateways.get(gatewayname)
            if gateway != None:
               gatewayip =  k8sutils.getgatewayip(gateway.get('slice'),gateway.get('cluster'),config_path)
+              if gatewayip == None:
+                  print('IoT Gateway %s not found' %gatewayname)
+                  return
               if not gatewayutils.deleteDevice(gatewayip,devicename):
                   print('Impossible to dettach from IoT Gateway')
                   return

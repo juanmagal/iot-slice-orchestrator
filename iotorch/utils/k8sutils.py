@@ -1,5 +1,6 @@
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from kubernetes.config import ConfigException
 from urllib3.exceptions import MaxRetryError
 
 from pyhelm.chartbuilder import ChartBuilder
@@ -17,7 +18,12 @@ def createnamespace(iotslice,cluster,configfile):
        print ("Context for cluster %s not found" %cluster)
        return False
 
-    config.load_kube_config(context=contextname)
+    try:
+       config.load_kube_config(context=contextname)
+    except ConfigException as ce:
+       print ("Error loading Kubernetes configuration")
+       return False 
+   
     v1 = client.CoreV1Api()
 
     namespace = client.V1Namespace(
@@ -46,7 +52,11 @@ def deletenamespace(iotslice,cluster,configfile):
        print ("Context for cluster %s not found" %cluster)
        return False
 
-    config.load_kube_config(context=contextname)
+    try:
+       config.load_kube_config(context=contextname)
+    except ConfigException as ce:
+       print ("Error loading Kubernetes configuration")
+       return False
 
     v1 = client.CoreV1Api()
 
@@ -76,7 +86,11 @@ def getservices(iotslice,cluster,configfile):
        print ("Context for cluster %s not found" %cluster)
        return None
 
-    config.load_kube_config(context=contextname)
+    try:
+       config.load_kube_config(context=contextname)
+    except ConfigException as ce:
+       print ("Error loading Kubernetes configuration")
+       return None
 
     v1 = client.CoreV1Api()
 

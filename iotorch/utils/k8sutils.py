@@ -134,11 +134,13 @@ def getgatewayip(iotslice,cluster,configfile):
 
 def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 
-    clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
+    clusterhelmip=iotorchutils.getk8sclusterhelmip(cluster,configfile)
+
+    print(clusterhelmip)
 
     clusterhelmport=iotorchutils.getk8sclusterhelmport(cluster,configfile)
 
-    if clusterip == None:
+    if clusterhelmip == None:
        print ("IP Address for cluster %s not found" %cluster)
        return False
 
@@ -146,7 +148,7 @@ def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 
     chart = ChartBuilder({'name': name, 'source': {'type': 'directory', 'location': helmpath}})
 
-    t = Tiller(host=clusterip,port=clusterhelmport)
+    t = Tiller(host=clusterhelmip,port=clusterhelmport)
 
     t.install_release(chart.get_helm_chart(), dry_run=False, namespace=iotslice, name=releasename)
 
@@ -154,11 +156,11 @@ def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 
 def deletehelmincluster(iotslice,cluster,configfile,name):
 
-    clusterip=iotorchutils.getk8sclusterip(cluster,configfile)
+    clusterhelmip=iotorchutils.getk8sclusterhelmip(cluster,configfile)
 
     clusterhelmport=iotorchutils.getk8sclusterhelmport(cluster,configfile)
 
-    t = Tiller(host=clusterip,port=clusterhelmport)
+    t = Tiller(host=clusterhelmip,port=clusterhelmport)
 
     releasename = name+"-"+iotslice
 

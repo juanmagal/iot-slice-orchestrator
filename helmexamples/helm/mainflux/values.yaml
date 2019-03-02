@@ -223,7 +223,7 @@ tolerations: []
 affinity: {}
 
 global:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
   replicas: 1
 

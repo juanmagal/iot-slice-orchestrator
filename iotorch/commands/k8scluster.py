@@ -2,7 +2,7 @@
 iotorch k8scluster
 
   Usage:  
-    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--k8shelmport=<port>] [--configfile=<name>]  
+    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--k8shelmip=<port> [--k8shelmport=<port>] [--configfile=<name>]  
     iotorch k8scluster [delete|get] --name=<name> [--configfile=<name>]
     iotorch k8scluster list [--configfile=<name>]
 
@@ -33,6 +33,19 @@ class K8scluster(Base):
               print('Wrong IP Address format')
               return
         helmport=self.options['--k8shelmport']
+        if helmport == None:
+           helmport = "44134"
+       
+        helmip=self.options['--k8shelmport']
+        if helmip == None:
+           helmip = ipaddr
+        else:
+           try:
+              ip = ipaddress.ip_address(unicode(helmip, "utf-8"))
+           except ValueError:
+              print('Wrong Helm IP Address format')
+              return
+
         k8s_context = self.options['--k8scontext']
 
         config_path = self.options['--configfile']
@@ -40,7 +53,7 @@ class K8scluster(Base):
         if (not config_path):
            config_path='./iotorch.toml'
 
-        clusterparams = {'ip':ipaddr,'k8scontext':k8s_context,'helmport':helmport}
+        clusterparams = {'ip':ipaddr,'k8scontext':k8s_context,'helmport':helmport,'helmip':helmip}
 
         cluster = {clustername:clusterparams}
 

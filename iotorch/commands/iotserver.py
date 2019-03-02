@@ -129,8 +129,6 @@ class Iotserver(Base):
 
         server.update(serverparams)
 
-        servers.update(server)
-
         # Create user in mainflux
 
         clustername = server.get('cluster')
@@ -146,7 +144,9 @@ class Iotserver(Base):
            print('User was not created in IoT Server %s' %servername)
            return
 
-        servers.update({servername:{'serverip':serverip}})
+        server.update({'serverip':serverip})
+
+        servers.update(servername:server)
 
         config.update({'iotservers':servers})
 

@@ -186,7 +186,16 @@ class Iotserver(Base):
         server = servers.pop(servername)
 
         slicename = server.get('slice')
+
+        if slicename == None:
+           print('No slice is assigned to this IoT Server')
+           return
+
         clustername = server.get('cluster')
+
+        if clustername == None:
+           print('No cluster is assigned to this IoT Server')
+           return
 
         if not k8sutils.deleteiotserverincluster(slicename,clustername,config_path):
            print('IoT Server not removed from cluster %s' %cluster)

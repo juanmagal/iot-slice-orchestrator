@@ -155,7 +155,7 @@ global:
 
   serviceType: LoadBalancer
 
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
   probes:
     initial_delay: 5

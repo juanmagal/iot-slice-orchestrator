@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.edgex_core_command.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    io.kompose.service: {{ .Values.edgex_core_command.name }}
+spec:
+  type: {{ .Values.global.serviceType }}
+  ports:
+    - port: {{ .Values.edgex_core_command.port }}
+      name: server
+  selector:
+    io.kompose.service: {{ .Values.edgex_core_command.name }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_core_command.name }}
+  name: {{ .Values.edgex_core_command.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.edgex_core_command.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_core_command.name }}
+  name: {{ .Values.edgex_core_command.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.edgex_core_command.name }}
+    spec:
+      containers:
+      - image: {{ .Values.coreCommandImage }}
+        name: {{ .Values.edgex_core_command.name }}
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.edgex_core_command.port }}
+        resources: {}
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: {{ .Values.edgex_core_command.port }}
+          initialDelaySeconds: {{ .Values.global.probes.initial_delay }}
+          timeoutSeconds: {{ .Values.global.probes.timeout }}
+          periodSeconds: {{ .Values.global.probes.period }}
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: {{ .Values.edgex_core_command.port }}
+          initialDelaySeconds: {{ .Values.global.probes.delay }}
+          timeoutSeconds: {{ .Values.global.probes.timeout }}
+          periodSeconds: {{ .Values.global.probes.period }}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.logs.mountPath }}
+          name: {{ .Values.volumes.logs.name }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.volumes.logs.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.logs.claimName }}
+

@@ -1,0 +1,150 @@
+# Default values for edgexfoundry.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+# images
+coreCommandImage: juanman/docker-rpi-core-command-go:latest
+coreConsulImage: consul:1.3.1
+coreDataImage: juanman/docker-rpi-core-data-go:latest
+exportClientImage: juanman/docker-rpi-export-client-go:latest
+exportDistroImage: juanman/docker-rpi-export-distro-go:latest
+loggingImage: juanman/docker-rpi-support-logging-go:latest
+coreMetadataImage: juanman/docker-rpi-core-metadata-go:latest
+mongoImage: juanman/docker-rpi-edgex-mongo:latest
+notificationsImage: juanman/docker-rpi-support-notifications-go:latest
+#schedulerImage: juanman/docker-rpi-support-scheduler-go:latest
+configSeedImage: juanman/docker-rpi-core-config-seed-go:latest
+deviceMqttImage: juanman/docker-rpi-device-mqtt:latest
+mosquittoImage: eclipse-mosquitto
+
+
+# volumes
+volumes:
+  accessMode: ReadWriteOnce
+  size: 250Mi
+  mongo:
+    claimName: "mongo-data-claim"
+    path: "/tmp/data/db"
+    name: "mongo-data"
+    diskName: "mongo-data-disk"
+    mountPath: "/data/db"
+  consulconfig:
+    claimName: "consul-config-claim"
+    path: "/tmp/consul/config"
+    name: "consul-config"
+    diskName: "consul-config-disk"
+    mountPath: "/consul/config"
+  consuldata:
+    claimName: "consul-data-claim"
+    path: "/tmp/consul/data"
+    name: "consul-data"
+    diskName: "consul-data-disk"
+    mountPath: "/consul/data"
+  logs:
+    size: 250Mi
+    claimName: "logs-claim"
+    path: "/tmp/edgex/logs"
+    name: "logs"
+    diskName: "logs-disk"
+    mountPath: "/edgex/logs"
+
+
+edgex_config_seed:
+  name: "edgex-config-seed" 
+
+consul:
+  name: "edgex-core-consul"
+  ports:
+    server: 8300
+    cli_rpc: 8400
+    https: 8443
+    http: 8500
+    dns: 8600
+
+mosquitto:
+  name: "mosquitto"
+  ports:
+    http: 9001
+    mqtt: 1883
+
+
+edgex_core_command:
+  name: "edgex-core-command"
+  port: 48082
+
+edgex_core_data:
+  name: "edgex-core-data"
+  ports:
+    http: 48080
+    zero_queue: 5563
+    
+edgex_export_client:
+  name: "edgex-export-client"
+  port: 48071
+
+edgex_export_distro:
+  name: "edgex-export-distro"
+  ports:
+    http: 48070
+    analytics_queue: 5566
+    message_queue: 5563
+
+edgex_logging:
+  name: "edgex-support-logging"
+  port: 48061
+
+edgex_core_metadata:
+  name: "edgex-core-metadata"
+  port: 48081
+
+mongo:
+  name: "edgex-mongo"
+  port: 27017
+
+edgex_notifications:
+  name: "edgex-support-notifications"
+  port: 48060
+
+edgex_rules_engine:
+  enabled: false
+  name: "edgex-support-rulesengine"
+  port: 48075
+
+#edgex_scheduler:
+#  name: "edgex-support-scheduler"
+#  port: 48085
+
+edgex_device_mqtt:
+  enabled: true
+  name: "edgex-device-mqtt"
+  port: 49982
+
+defaultResources: 
+  requests:
+    cpu: 0
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+global:
+  hpa:
+    min: 1
+    max: 10
+    metric: cpu
+    utilization: 80
+
+#  namespace: default
+
+  serviceType: LoadBalancer
+
+  pullPolicy: Always
+
+  probes:
+    initial_delay: 5
+    timeout: 1
+    period: 15
+    delay: 15

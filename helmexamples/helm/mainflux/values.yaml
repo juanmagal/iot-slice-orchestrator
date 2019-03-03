@@ -165,9 +165,10 @@ ws:
 influxdb:
   name: "mainflux-influxdb"
   port: 8086
-  INFLUXDB_DB: "mainflux"
-  INFLUXDB_ADMIN_USER: "mainflux"
-  INFLUXDB_ADMIN_PASSWORD: "mainflux"
+  env:
+    INFLUXDB_DB: "mainflux"
+    INFLUXDB_ADMIN_USER: "mainflux"
+    INFLUXDB_ADMIN_PASSWORD: "mainflux"
 
 reader:
   name: "influxdb-reader"
@@ -180,6 +181,7 @@ reader:
       MF_INFLUX_READER_DB_PORT: "8086"
       MF_INFLUX_READER_DB_USER: "mainflux"
       MF_INFLUX_READER_DB_PASS: "mainflux"
+      MF_INFLUX_READER_LOG_LEVEL: "debug"
 
 writer:
   name: "influxdb-writer"
@@ -194,6 +196,7 @@ writer:
       MF_INFLUX_WRITER_DB_PORT: "8086"
       MF_INFLUX_WRITER_DB_USER: "mainflux"
       MF_INFLUX_WRITER_DB_PASS: "mainflux"
+      MF_INFLUX_WRITER_LOG_LEVEL: "debug"
 
 nginx:
   fullname: "mainflux-nginx"

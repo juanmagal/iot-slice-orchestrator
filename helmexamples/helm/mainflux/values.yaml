@@ -201,7 +201,7 @@ nginx:
   ports:
     http: 80
     https: 443
-    mqtt: 8883
+    mqtt: 1883
 
 redis:
   name: "mainflux-redis"

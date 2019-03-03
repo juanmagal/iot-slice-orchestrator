@@ -39,6 +39,7 @@ spec:
     - port: {{ .Values.influxdb.port }}
   selector:
     component: {{ .Values.influxdb.name }}
+  type: {{ .Values.global.serviceType}}
 ---
 apiVersion: apps/v1beta1
 kind: Deployment

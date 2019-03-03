@@ -1,4 +1,5 @@
 import requests
+from requests import ConnectionError
 
 from . import k8sutils
 
@@ -7,11 +8,12 @@ def createServerUser(user, password, cluster, serverip):
 
   url = 'http://'+serverip+'/users'
 
-  print(url)
-
   payload = {'email': user , 'password': password }
 
-  response = requests.post(url, json=payload)
+  try:
+    response = requests.post(url, json=payload)
+  except ConnectionError as ce:
+     return None
 
   if (response.status_code == 201) or (response.status_code == 200):
      return True
@@ -23,7 +25,10 @@ def getToken(payload,serverip):
 
   url = 'http://'+serverip+'/tokens'
 
-  response = requests.post(url, json=payload)
+  try:
+    response = requests.post(url, json=payload)
+  except ConnectionError as ce:
+     return None
  
   if (response.status_code == 200) or (response.status_code == 201):
      data = response.json()
@@ -48,7 +53,10 @@ def createDevice(serverip,name,user,password):
   
   # Provision device
 
-  responsedev = requests.post(urlthings, json=payloaddev, headers=authheader)
+  try:
+    responsedev = requests.post(urlthings, json=payloaddev, headers=authheader)
+  except ConnectionError as ce:
+     return None
 
   if responsedev.status_code != 201:
      if responsedev.status_code != 200:
@@ -66,7 +74,10 @@ def createDevice(serverip,name,user,password):
 
   payloadchan = {'name': name}
 
-  responsechan = requests.post(urlchan, json=payloadchan, headers=authheader)
+  try:
+    responsechan = requests.post(urlchan, json=payloadchan, headers=authheader)
+  except ConnectionError as ce:
+     return None
 
   if responsechan.status_code != 201:
      if responsechan.status_code != 200:
@@ -81,7 +92,10 @@ def createDevice(serverip,name,user,password):
 
   urldevchan= 'http://'+serverip+'/channels/'+chanid+'/things/'+devid
 
-  responseassocdevtochan = requests.put(urldevchan, headers=authheader)
+  try:
+    responseassocdevtochan = requests.put(urldevchan, headers=authheader)
+  except ConnectionError as ce:
+     return None
 
   if responseassocdevtochan.status_code != 201:
      if responseassocdevtochan.status_code != 200:
@@ -101,7 +115,10 @@ def getDevice(token,serverip,devid):
 
   url = 'http://'+serverip+'/things/'+devid
 
-  response = requests.get(url, headers=authheader )
+  try:
+     response = requests.get(url, headers=authheader )
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 200:
      return None
@@ -123,8 +140,10 @@ def deleteDevice(serverip,devid,user,password):
   urlthings = 'http://'+serverip+'/things/'+devid
 
   # Delete device
-
-  responsedev = requests.delete(urlthings, headers=authheader)
+  try:
+    responsedev = requests.delete(urlthings, headers=authheader)
+  except ConnectionError as ce:
+     return None
 
   if responsedev.status_code != 404:
      if responsedev.status_code != 204:

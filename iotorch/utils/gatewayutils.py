@@ -1,5 +1,7 @@
 import requests
 
+from requests import ConnectionError
+
 import json
 
 from . import k8sutils
@@ -18,7 +20,10 @@ def createExporter(gatewayip,gatewayname,servername,serverip,servertopic,topicus
   
   # Provision Exporter
 
-  response = requests.post(url, json=registrationdata)
+  try:
+    response = requests.post(url, json=registrationdata)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 201:
      if response.status_code != 200:
@@ -33,7 +38,10 @@ def deleteExporter(gatewayip,gatewayname):
 
   # Provision Exporter
 
-  response = requests.delete(url)
+  try:
+    response = requests.delete(url)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 200:
      if response.status_code != 204:
@@ -56,7 +64,7 @@ def createDeviceProfile(gatewayip,devicename,resources):
   properties = {"value":value,"units":units} 
 
   responses = [{"code":"200","description": "get resource value"},{"code":"503","description": "service unavailable"}]
-   
+
   resourceIndex = 0
 
   for item in resources:
@@ -69,7 +77,10 @@ def createDeviceProfile(gatewayip,devicename,resources):
       devProfileData['resources'].append(resdata)
       devProfileData['commands'].append(getcommanddata)
 
-  response = requests.post(url, json=devProfileData)
+  try:
+    response = requests.post(url, json=devProfileData)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 201:
      if response.status_code != 200:
@@ -81,7 +92,10 @@ def deleteDeviceProfile(gatewayip,devicename):
 
   url = 'http://'+gatewayip+':48081/api/v1/deviceprofile/name/'+devicename
 
-  response = requests.delete(url)
+  try:
+    response = requests.delete(url)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 200:
      if response.status_code != 204:
@@ -97,7 +111,10 @@ def createMqttAddressable(gatewayip,devicename):
 
   addressabledata = {"name":devicename, "protocol": "TCP", "address": "0.0.0.0", "port": 1883, "publisher":"CommandPublisher", "user":"admin", "password":"public", "topic":"CommandTopic", "baseURL":"TCP://0.0.0.0:1883", "url":"TCP://0.0.0.0:1883"}
 
-  response = requests.post(url, json=addressabledata)
+  try:
+    response = requests.post(url, json=addressabledata)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 201:
      if response.status_code != 200:
@@ -109,7 +126,10 @@ def deleteAddressable(gatewayip,devicename):
 
   url = 'http://'+gatewayip+':48081/api/v1/addressable/name/'+devicename
 
-  response = requests.delete(url)
+  try:
+    response = requests.delete(url)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 200:
      if response.status_code != 204:
@@ -117,7 +137,6 @@ def deleteAddressable(gatewayip,devicename):
          return False
 
   return True
-
 
 def createDevice(gatewayip,devicename,protocol,protocolformat,resources):
 
@@ -145,7 +164,10 @@ def createDevice(gatewayip,devicename,protocol,protocolformat,resources):
 
   devicedata = {"name": devicename, "adminState": "UNLOCKED", "operatingState": "ENABLED", "addressable":addressable, "profile":profile, "service":service}
 
-  response = requests.post(url, json=devicedata)
+  try:
+    response = requests.post(url, json=devicedata)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 201:
      if response.status_code != 200:
@@ -163,7 +185,10 @@ def deleteDevice(gatewayip,devicename):
 
   url = 'http://'+gatewayip+':48081/api/v1/device/name/'+devicename
 
-  response = requests.delete(url)
+  try:
+    response = requests.delete(url)
+  except ConnectionError as ce:
+     return None
 
   if response.status_code != 200:
      if response.status_code != 204:

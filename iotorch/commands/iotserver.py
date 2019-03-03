@@ -146,7 +146,7 @@ class Iotserver(Base):
 
         server.update({'serverip':serverip})
 
-        servers.update(servername:server)
+        servers.update({servername:server})
 
         config.update({'iotservers':servers})
 

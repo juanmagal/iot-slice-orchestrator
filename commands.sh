@@ -17,8 +17,17 @@ iotorch iotserver set --name=iotserver1 --user=testuser@test.com --password=1234
 iotorch iotserver set --name=iotserver2 --user=testuser@test.com --password=123456
 iotorch iotserver set --name=iotserver3 --user=testuser@test.com --password=123456
 
+# Gateways
+iotorch iotgateway create --name=iotgw1 --cluster=pc --slice=slice1 --helmpath=helmexamples/helm/edgex-go/
+iotorch iotgateway create --name=iotgw2 --cluster=laptop --slice=slice2 --helmpath=helmexamples/helm/edgex-go/
+iotorch iotgateway create --name=gwtest --cluster=rpi --slice=slice3 --helmpath=helmexamples/helm-arm/edgex-go/
+ 
+iotorch iotgateway attach --name=iotgw1 --server=iotserver1
+iotorch iotgateway attach --name=iotgw2 --server=iotserver2
+iotorch iotgateway attach --name=iotgw3 --server=iotserver3
 
-iotorch iotgateway create --name=gwtest --cluster=laptop --slice=slicetest --helmpath=helmexamples/helm/edgex-go/
-iotorch iotgateway attach --name=gatewaytest --server=servertest
+
+
+
 iotorch iotdevice create --name testdevice2 --gateway gwtest --protocol MQTT --resource=temperature --resource=humidity
 

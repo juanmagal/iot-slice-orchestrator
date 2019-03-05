@@ -153,6 +153,7 @@ def createDevice(gatewayip,devicename,protocol,protocolformat,resources):
   addressable = {"name": devicename}
 
   if not createDeviceProfile(gatewayip,devicename,resources):
+     print("error")
      return False
 
   profile = {"name": devicename}
@@ -177,12 +178,6 @@ def createDevice(gatewayip,devicename,protocol,protocolformat,resources):
 
 def deleteDevice(gatewayip,devicename):
 
-  if not deleteAddressable(gatewayip,devicename):
-     return False
-
-  if not deleteDeviceProfile(gatewayip,devicename):
-     return False
-
   url = 'http://'+gatewayip+':48081/api/v1/device/name/'+devicename
 
   try:
@@ -192,8 +187,13 @@ def deleteDevice(gatewayip,devicename):
 
   if response.status_code != 200:
      if response.status_code != 204:
-        if response.status_code != 404:
          return False
+
+  if not deleteDeviceProfile(gatewayip,devicename):
+     return False
+
+  if not deleteAddressable(gatewayip,devicename):
+     return False
 
   return True
 

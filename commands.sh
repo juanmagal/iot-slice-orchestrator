@@ -40,16 +40,16 @@ iotorch iotdevice create --name=iotdevice8 --gateway iotgw1 --protocol MQTT --re
 iotorch iotdevice create --name=iotdevice9 --gateway iotgw1 --protocol MQTT --resource=temperature --resource=humidity
 iotorch iotdevice create --name=iotdevice10 --gateway iotgw1 --protocol MQTT --resource=temperature --resource=humidity
 
-iotorch iotdevice create --name=iotdevice1 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice2 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice3 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice4 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice5 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice6 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice7 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice8 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice9 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
-iotorch iotdevice create --name=iotdevice10 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice1 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice2 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice3 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice4 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice5 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice6 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice7 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice8 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice9 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice2iotdevice0 --gateway iotgw2 --protocol MQTT --resource=temperature --resource=humidity
 
 iotorch iotdevice create --name=iotdevice1 --gateway iotgw3 --protocol MQTT --resource=temperature --resource=humidity
 iotorch iotdevice create --name=iotdevice2 --gateway iotgw3 --protocol MQTT --resource=temperature --resource=humidity

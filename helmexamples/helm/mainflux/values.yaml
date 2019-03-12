@@ -9,7 +9,8 @@ httpAdapterImage: "mainflux/http:latest"
 wsAdapterImage: "mainflux/ws:latest"
 influxdbImage: "influxdb:1.5.2-alpine"
 influxdbReaderImage: "mainflux/influxdb-reader:latest"
-influxdbWriterImage: "mainflux/influxdb-writer:latest"
+#influxdbWriterImage: "mainflux/influxdb-writer:latest"
+influxdbWriterImage: "juanman/influxdb-writer:latest"
 nginxImage: nginx:1.13-alpine
 usersImage: mainflux/users:latest
 thingsImage: mainflux/things:latest

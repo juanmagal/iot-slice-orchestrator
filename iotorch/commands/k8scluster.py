@@ -36,7 +36,7 @@ class K8scluster(Base):
         if helmport == None:
            helmport = "44134"
        
-        helmip=self.options['--k8shelmport']
+        helmip=self.options['--k8shelmip']
         if helmip == None:
            helmip = ipaddr
         else:

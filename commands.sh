@@ -2,6 +2,8 @@
 iotorch k8scluster create --name=laptop --ip=192.168.122.150 --k8shelmport=44134 --k8scontext=laptop
 iotorch k8scluster create --name=pc --ip=192.168.1.105 --k8shelmport=44134 --k8scontext=pc
 iotorch k8scluster create --name=rpi --ip=192.168.1.160 --k8shelmport=44134 --k8scontext=rpi
+iotorch k8scluster create --name=gke --ip=35.198.89.150 --k8shelmport=44134 --k8scontext=gke_protean-bus-234414_europe-west3-a_standard-cluster-1 --helmip=35.198.157.223
+
 
 # Slices
 iotorch iotslice create --name=slice1 --edge pc --cloud pc

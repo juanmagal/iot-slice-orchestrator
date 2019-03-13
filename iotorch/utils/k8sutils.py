@@ -136,8 +136,6 @@ def createhelmincluster(iotslice,cluster,helmpath,configfile,name):
 
     clusterhelmip=iotorchutils.getk8sclusterhelmip(cluster,configfile)
 
-    print(clusterhelmip)
-
     clusterhelmport=iotorchutils.getk8sclusterhelmport(cluster,configfile)
 
     if clusterhelmip == None:

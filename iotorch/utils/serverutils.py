@@ -8,6 +8,8 @@ def createServerUser(user, password, cluster, serverip):
 
   url = 'http://'+serverip+'/users'
 
+  print(url)
+
   payload = {'email': user , 'password': password }
 
   try:
@@ -18,6 +20,7 @@ def createServerUser(user, password, cluster, serverip):
   if (response.status_code == 201) or (response.status_code == 200):
      return True
   else:
+     print(str(response.status_code))
      print("Error")
      return False
 

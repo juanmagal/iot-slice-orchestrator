@@ -2,7 +2,7 @@
 iotorch k8scluster
 
   Usage:  
-    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--k8shelmip=<port> [--k8shelmport=<port>] [--configfile=<name>]  
+    iotorch k8scluster create --name=<name> [--ip=<ipaddress>] [--k8scontext=<context>] [--k8shelmip=<port>]º [--k8shelmport=<port>] [--configfile=<name>]  
     iotorch k8scluster [delete|get] --name=<name> [--configfile=<name>]
     iotorch k8scluster list [--configfile=<name>]
 

@@ -10,8 +10,9 @@ spec:
     storage: {{ .Values.volumes.size }}
   accessModes:
     - {{ .Values.volumes.accessMode }}
-  hostPath:
-    path: {{ .Values.volumes.consulconfig.path }}-{{ .Release.Namespace }}
+  nfs:
+    server: {{ .Values.volumes.nfsserverip }}
+    path: {{ .Values.volumes.consulconfig.path }}
   persistentVolumeReclaimPolicy: Delete
 ---
 kind: PersistentVolumeClaim
@@ -20,6 +21,7 @@ metadata:
   name: {{ .Values.volumes.consulconfig.claimName }}
   namespace: {{ .Values.global.namespace }}
 spec:
+  storageClassName: ""
   accessModes:
     - {{ .Values.volumes.accessMode }}
   resources:
@@ -38,8 +40,9 @@ spec:
     storage: {{ .Values.volumes.size }}
   accessModes:
     - {{ .Values.volumes.accessMode }}
-  hostPath:
-    path: {{ .Values.volumes.consuldata.path }}-{{ .Release.Namespace }}
+  nfs:
+    server: {{ .Values.volumes.nfsserverip }}
+    path: {{ .Values.volumes.consuldata.path }}
   persistentVolumeReclaimPolicy: Delete
 ---
 kind: PersistentVolumeClaim
@@ -48,6 +51,7 @@ metadata:
   name: {{ .Values.volumes.consuldata.claimName }}
   namespace: {{ .Values.global.namespace }}
 spec:
+  storageClassName: ""
   accessModes:
     - {{ .Values.volumes.accessMode }}
   resources:

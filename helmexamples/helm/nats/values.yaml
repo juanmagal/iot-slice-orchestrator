@@ -1,0 +1,46 @@
+# Default values for deploying NATS in mainflux
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+# images
+#natsImage: nats:1.3.0
+natsOperatorImage: "connecteverything/nats-operator:0.3.0-v1alpha2"
+natsMetricsImage: "synadia/prometheus-nats-exporter"
+
+namespace: "nats-io"
+
+nats:
+  name: "nats-mainflux"
+  ports:
+    client: 4222
+    cluster: 6222
+    monitor: 8222
+
+natsOperator:
+  name: "nats-operator"
+  binding: "nats-operator-binding"
+  ports: 
+    readyz: 8080
+
+natsCluster:
+  name: "natsclusters.nats.io"
+
+natsServiceRole:
+  name: "natsserviceroles.nats.io"
+
+replicas: 1
+
+pullPolicy: Always
+
+probe:
+  initialDelay: 15
+  timeout: 3
+
+envFieldPath:
+  MY_POD_NAMESPACE: "metadata.namespace"
+  MY_POD_NAME: "metadata.name"
+
+natsMetrics:
+  name: "nats-cluster-metrics"
+  enabled: true

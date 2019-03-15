@@ -34,7 +34,7 @@ iotorch iotgateway create --name=iotgw4 --cluster=gke --slice=slice4 --helmpath=
 iotorch iotgateway attach --name=iotgw1 --server=iotserver1
 iotorch iotgateway attach --name=iotgw2 --server=iotserver2
 iotorch iotgateway attach --name=iotgw3 --server=iotserver3
-
+iotorch iotgateway attach --name=iotgw4 --server=iotserver4
 
 # Devices
 
@@ -71,4 +71,14 @@ iotorch iotdevice create --name=iotdevice8 --gateway iotgw3 --protocol MQTT --re
 iotorch iotdevice create --name=iotdevice9 --gateway iotgw3 --protocol MQTT --resource=temperature --resource=humidity
 iotorch iotdevice create --name=iotdevice10 --gateway iotgw3 --protocol MQTT --resource=temperature --resource=humidity
 
+iotorch iotdevice create --name=slice4iotdevice1 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice2 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice3 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice4 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice5 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice6 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice7 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice8 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice9 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
+iotorch iotdevice create --name=slice4iotdevice0 --gateway iotgw4 --protocol MQTT --resource=temperature --resource=humidity
 

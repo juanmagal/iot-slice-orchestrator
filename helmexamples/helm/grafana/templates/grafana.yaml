@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.grafana.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    component: {{ .Values.grafana.name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.grafana.name }}
+    spec:
+      containers:
+      - name: {{ .Values.grafana.name }}
+        image: {{ .Values.grafanaImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.grafana.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    component: {{ .Values.grafana.name }}
+spec:
+  selector:
+    component: {{ .Values.grafana.name }}
+  ports:
+  - port: {{ .Values.grafana.port }}
+  type: {{ .Values.serviceType }}
+

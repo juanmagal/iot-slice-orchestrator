@@ -23,30 +23,31 @@ mosquittoImage: eclipse-mosquitto
 
 # volumes
 volumes:
+  nfsserverip: 10.3.243.180
   accessMode: ReadWriteMany
   size: 250Mi
   mongo:
     claimName: "mongo-data-claim"
-    path: "/tmp/data/db"
+    path: "/"
     name: "mongo-data"
     diskName: "mongo-data-disk"
     mountPath: "/data/db"
   consulconfig:
     claimName: "consul-config-claim"
-    path: "/tmp/consul/config"
+    path: "/"
     name: "consul-config"
     diskName: "consul-config-disk"
     mountPath: "/consul/config"
   consuldata:
     claimName: "consul-data-claim"
-    path: "/tmp/consul/data"
+    path: "/"
     name: "consul-data"
     diskName: "consul-data-disk"
     mountPath: "/consul/data"
   logs:
     size: 250Mi
     claimName: "logs-claim"
-    path: "/tmp/edgex/logs"
+    path: "/"
     name: "logs"
     diskName: "logs-disk"
     mountPath: "/edgex/logs"

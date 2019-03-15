@@ -8,7 +8,8 @@ coreCommandImage: juanman/docker-rpi-core-command-go:latest
 coreConsulImage: consul:1.3.1
 coreDataImage: juanman/docker-rpi-core-data-go:latest
 exportClientImage: juanman/docker-rpi-export-client-go:latest
-exportDistroImage: juanman/docker-rpi-export-distro-go:latest
+#exportDistroImage: juanman/docker-rpi-export-distro-go:latest
+exportDistroImage: juanman/docker-rpi-export-distro-go:influx
 loggingImage: juanman/docker-rpi-support-logging-go:latest
 coreMetadataImage: juanman/docker-rpi-core-metadata-go:latest
 mongoImage: juanman/docker-rpi-edgex-mongo:latest

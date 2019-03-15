@@ -10,8 +10,9 @@ spec:
     storage: {{ .Values.volumes.size }}
   accessModes:
     - {{ .Values.volumes.accessMode }}
-  hostPath:
-    path: {{ .Values.volumes.mongo.path }}-{{ .Release.Namespace }}
+  nfs:
+    server: {{ .Values.volumes.nfsserverip }}
+    path: {{ .Values.volumes.mongo.path }}
   persistentVolumeReclaimPolicy: Delete
 ---
 kind: PersistentVolumeClaim
@@ -20,6 +21,7 @@ metadata:
   name: {{ .Values.volumes.mongo.claimName }}
   namespace: {{ .Values.global.namespace }}
 spec:
+  storageClassName: ""
   accessModes:
     - {{ .Values.volumes.accessMode }}
   resources:

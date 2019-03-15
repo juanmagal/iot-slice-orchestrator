@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: edgex-influxdb-data-disk
+  labels:
+    name: edgex-influxdb-data-disk
+spec:
+  capacity:
+    storage: 250Mi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 10.3.243.180 
+    path: "/"
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: edgex-influxdb-data-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 250Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edgex-influxdb
+  labels:
+    name: edgex-influxdb
+spec:
+  ports:
+    - port: 8086
+      name: "api"
+      targetPort: 8086
+    - port: 8088
+      name: "udp"
+      targetPort: 8088
+  selector:
+    name: edgex-influxdb
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: edgex-influxdb 
+  name: edgex-influxdb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: edgex-influxdb
+    spec:
+      volumes:
+#      - name: configmap-volume
+#        configMap:
+#          name: edgex-influxdb-configmap
+      - name: edgex-influxdb-data
+#        emptyDir: {}
+#        hostPath:
+#          path: /influx/data
+        persistentVolumeClaim:
+          claimName: edgex-influxdb-data-claim
+      containers:
+      - image: influxdb:alpine
+        name: edgex-influxdb
+        env:
+          - name: INFLUXDB_DB
+            value: "edgex"
+          - name: INFLUXDB_ADMIN_USER
+            value: "edgex"
+          - name: INFLUXDB_ADMIN_PASSWORD
+            value: "edgex"
+          - name: INFLUXDB_HTTP_AUTH_ENABLED
+            value: "true"
+          - name: INFLUXDB_HTTP_LOG_ENABLED
+            value: "true"
+        ports:
+        - containerPort: 8086
+          name: "api"
+        - containerPort: 8088
+          name: "udp"
+        resources: {}
+        volumeMounts:
+#        - mountPath: /etc/influxdb/influxdb.conf
+#          name: configmap-volume
+#          subPath: influxdb.conf
+        - mountPath: /var/lib/influxdb
+          name: edgex-influxdb-data
+      restartPolicy: Always

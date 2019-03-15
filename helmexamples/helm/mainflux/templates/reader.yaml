@@ -36,4 +36,4 @@ spec:
     component: {{ .Values.reader.name }}
   ports:
   - port: {{ .Values.reader.port }}
-  type: {{ .Values.global.serviceType }}
+  type: ClusterIP

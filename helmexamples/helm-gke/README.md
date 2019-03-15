@@ -5,7 +5,6 @@ gcloud init
 gcloud config list
 gcloud container clusters get-credentials <cluster-name>
 ```
-
 ### 2. Install Helm in cluster
 ```
 kubectl create serviceaccount --namespace kube-system tiller
@@ -18,3 +17,8 @@ gcloud compute disks create --size=10GB --zone=us-east1-b gce-nfs-disk
 kubectl create namespace nfs
 kubectl apply -n nfs -f k8s/nfs-server.yaml
 ```
+### 3. Install NATS cluster (for Mainflux)
+```
+helm install --namespace nats-io helmexamples/helm/nats/
+```
+

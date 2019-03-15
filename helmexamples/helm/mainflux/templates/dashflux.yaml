@@ -10,7 +10,7 @@ spec:
     component: {{ .Values.dashflux.name }}
   ports:
   - port: {{ .Values.dashflux.port }}
-  type: {{ .Values.global.serviceType }}
+  type: ClusterIP
 ---
 apiVersion: apps/v1beta1
 kind: Deployment

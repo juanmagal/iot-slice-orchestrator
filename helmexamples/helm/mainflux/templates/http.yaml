@@ -10,7 +10,7 @@ spec:
   - port: {{ .Values.http.adapterPort }}
   selector:
     component: {{ .Values.http.adapterName }}
-  type: {{ .Values.global.serviceType}}
+  type: ClusterIP
 ---
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler

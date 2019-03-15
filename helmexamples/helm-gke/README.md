@@ -24,6 +24,7 @@ helm install --namespace nats-io helmexamples/helm/nats/
 ### 5. Iotorch commands 
 
 Get ip and context from config view data and helm ip from services data (note it must be exposed)
+GOOGLE_APPLICATION_CREDENTIALS must be properly settled.
 
 ``` 
 kubectl get services --all-namespaces

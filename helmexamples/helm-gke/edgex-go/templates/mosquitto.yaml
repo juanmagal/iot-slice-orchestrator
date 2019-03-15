@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mosquitto.name }}
+  name: {{ .Values.mosquitto.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  type: {{ .Values.global.serviceType }}
+  ports:
+  - name: "mqtt"
+    port: {{ .Values.mosquitto.ports.mqtt }}
+  - name: "http"
+    port: {{ .Values.mosquitto.ports.http }}
+  selector:
+    io.kompose.service: {{ .Values.mosquitto.name }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mosquitto.name }}
+  name: {{ .Values.mosquitto.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.mosquitto.replicas }}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.mosquitto.name }}
+    spec:
+      containers:
+      - image: {{ .Values.mosquittoImage }}
+        name: {{ .Values.mosquitto.name }}
+        ports:
+        - containerPort: {{ .Values.mosquitto.ports.mqtt }}
+        - containerPort: {{ .Values.mosquitto.ports.http }}
+        resources: {}
+      restartPolicy: Always

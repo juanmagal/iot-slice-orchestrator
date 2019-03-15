@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.logs.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.logs.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.logs.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.logs.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.logs.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.logs.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.edgex_logging.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    io.kompose.service: {{ .Values.edgex_logging.name }}
+spec:
+  type: LoadBalancer
+  ports:
+    - port: {{ .Values.edgex_logging.port }}
+  selector:
+    io.kompose.service: {{ .Values.edgex_logging.name }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_logging.name }}
+  name: {{ .Values.edgex_logging.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.edgex_logging.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_logging.name }}
+  name: {{ .Values.edgex_logging.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.edgex_logging.name }}
+    spec:
+      containers:
+      - image: {{ .Values.loggingImage }}
+        name: {{ .Values.edgex_logging.name }}
+        ports:
+        - containerPort: {{ .Values.edgex_logging.port }}
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: {{ .Values.edgex_logging.port }}
+          initialDelaySeconds: {{ .Values.global.probes.initial_delay }}
+          timeoutSeconds: {{ .Values.global.probes.timeout }}
+          periodSeconds: {{ .Values.global.probes.period }}
+        livenessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: {{ .Values.edgex_logging.port }}
+          initialDelaySeconds: {{ .Values.global.probes.delay }}
+          timeoutSeconds: {{ .Values.global.probes.timeout }}
+          periodSeconds: {{ .Values.global.probes.period }}
+        resources: {}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.logs.mountPath }}
+          name: {{ .Values.volumes.logs.name }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.volumes.logs.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.logs.claimName }}
+

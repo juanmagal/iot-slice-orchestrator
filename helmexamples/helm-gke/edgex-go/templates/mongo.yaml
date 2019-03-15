@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.mongo.diskName }}-{{ .Release.Namespace }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    component: {{ .Values.volumes.mongo.diskName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.size }}
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  hostPath:
+    path: {{ .Values.volumes.mongo.path }}-{{ .Release.Namespace }}
+  persistentVolumeReclaimPolicy: Delete
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.volumes.mongo.claimName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.volumes.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - name: "27017"
+    port: {{ .Values.mongo.port }}
+  selector:
+    io.kompose.service: {{ .Values.mongo.name }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Values.mongo.name }}
+  minReplicas: {{ .Values.global.hpa.min }}
+  maxReplicas: {{ .Values.global.hpa.max }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ .Values.global.hpa.metric }}
+      targetAverageUtilization: {{ .Values.global.hpa.utilization }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.mongo.name }}
+    spec:
+      containers:
+      - image: {{ .Values.mongoImage }}
+        name: {{ .Values.mongo.name }}
+        ports:
+        - containerPort: {{ .Values.mongo.port }}
+        resources: {}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.mongo.mountPath }}
+          name: {{ .Values.volumes.mongo.name }}
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Values.volumes.mongo.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.mongo.claimName }}

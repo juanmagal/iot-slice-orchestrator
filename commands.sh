@@ -9,20 +9,27 @@ iotorch k8scluster create --name=gke --ip=35.198.89.150 --k8shelmport=44134 --k8
 iotorch iotslice create --name=slice1 --edge pc --cloud pc
 iotorch iotslice create --name=slice2 --edge laptop --cloud pc
 iotorch iotslice create --name=slice3 --edge rpi --cloud pc
+iotorch iotslice create --name=slice4 --edge gke --cloud gke
+
 
 # Servers
 iotorch iotserver create --name iotserver1 --cluster=pc --slice=slice1 --helmpath=./helmexamples/helm/mainflux/
 iotorch iotserver create --name iotserver2 --cluster=pc --slice=slice2 --helmpath=./helmexamples/helm/mainflux/
 iotorch iotserver create --name iotserver3 --cluster=pc --slice=slice3 --helmpath=./helmexamples/helm/mainflux/
+iotorch iotserver create --name iotserver4 --cluster=gke --slice=slice4 --helmpath=./helmexamples/helm/mainflux/
+
 
 iotorch iotserver set --name=iotserver1 --user=testuser@test.com --password=123456
 iotorch iotserver set --name=iotserver2 --user=testuser@test.com --password=123456
 iotorch iotserver set --name=iotserver3 --user=testuser@test.com --password=123456
+iotorch iotserver set --name=iotserver4 --user=testuser@test.com --password=287130
+
 
 # Gateways
 iotorch iotgateway create --name=iotgw1 --cluster=pc --slice=slice1 --helmpath=helmexamples/helm/edgex-go/
 iotorch iotgateway create --name=iotgw2 --cluster=laptop --slice=slice2 --helmpath=helmexamples/helm/edgex-go/
-iotorch iotgateway create --name=gwtest --cluster=rpi --slice=slice3 --helmpath=helmexamples/helm-arm/edgex-go/
+iotorch iotgateway create --name=iotgw3 --cluster=rpi --slice=slice3 --helmpath=helmexamples/helm-arm/edgex-go/
+iotorch iotgateway create --name=iotgw4 --cluster=gke --slice=slice4 --helmpath=helmexamples/helm-arm/edgex-go/
  
 iotorch iotgateway attach --name=iotgw1 --server=iotserver1
 iotorch iotgateway attach --name=iotgw2 --server=iotserver2

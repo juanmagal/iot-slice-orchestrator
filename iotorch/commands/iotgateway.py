@@ -86,11 +86,11 @@ class Iotgateway(Base):
            print('IoT Gateway not deployed in cluster %s' %cluster)
            return
 
-        gatewayip =  k8sutils.getgatewayip(slicename,clustername,config_path)
+#        gatewayip =  k8sutils.getgatewayip(slicename,clustername,config_path)
 
-        if gatewayip == None:
-           print('IoT Gateway not sucessfully deployed in cluster %s' %cluster)
-           return
+#        if gatewayip == None:
+#           print('IoT Gateway not sucessfully deployed in cluster %s' %cluster)
+#           return
 
         config.update({'iotgateways':gateways})
         with open(config_path,'w+') as f:

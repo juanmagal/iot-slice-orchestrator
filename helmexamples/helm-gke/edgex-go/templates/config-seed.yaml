@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    io.kompose.service: {{ .Values.edgex_config_seed.name }}
+  name: {{ .Values.edgex_config_seed.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: {{ .Values.edgex_config_seed.name }}
+    spec:
+      containers:
+      - image: {{ .Values.configSeedImage }}
+        name: {{ .Values.edgex_config_seed.name }}
+        resources: {}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.consulconfig.mountPath }}
+          name: {{ .Values.volumes.consulconfig.name }}
+        - mountPath: {{ .Values.volumes.logs.mountPath }}
+          name: {{ .Values.volumes.logs.name }}
+      restartPolicy: OnFailure
+      volumes:
+      - name: {{ .Values.volumes.consulconfig.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.consulconfig.claimName }}
+      - name: {{ .Values.volumes.logs.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.logs.claimName }}
+
